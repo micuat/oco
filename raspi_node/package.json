@@ -1,0 +1,15 @@
+{
+  "name": "raspi_node",
+  "version": "1.0.0",
+  "description": "for oco project",
+  "main": "index.js",
+  "dependencies": {
+    "serialport": "^7.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "naoto hieda",
+  "license": "MIT"
+}
