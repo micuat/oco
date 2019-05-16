@@ -4,6 +4,7 @@
   "description": "for oco project",
   "main": "index.js",
   "dependencies": {
+    "node-osc": "^4.1.0",
     "serialport": "^7.1.5"
   },
   "devDependencies": {},
