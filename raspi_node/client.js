@@ -1,6 +1,9 @@
 const { Client } = require('node-osc');
 
-const client = new Client('127.0.0.1', 3333);
-client.send('/oco/command', "G28", () => {
+const hostname = '192.168.1.237';
+// const hostname = '127.0.0.1';
+
+const client = new Client(hostname, 3333);
+client.send('/oco/command', "G0 X1", () => {
   client.close();
 });
