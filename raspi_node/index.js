@@ -20,8 +20,11 @@ oscServer.on('message', function (msg) {
 
 port.pipe(parser)
 
-parser.on('data', line => console.log(`> ${line}`))
-
-//setTimeout(() => {
-//  port.write('G28\n');
-//}, 1000);
+parser.on('data', line => {
+  if(line.trim() == "wait") {
+    process.stdout.write("|");
+  }
+  else {
+    console.log(`\n> ${line}`)
+  }
+})
