@@ -23,6 +23,24 @@ if(mode == "home") {
 else if(mode == "moveto") {
   command = `G0 X${position.x} Y${position.y}`;
 }
-client.send('/oco/command', command, () => {
-  client.close();
-});
+
+let count = 0;
+function next() {
+  let r = 10;
+  let x = (r + Math.cos(count * 0.01 * 0.5 * Math.PI) * r);
+  let y = (r + Math.sin(count * 0.01 * 0.5 * Math.PI) * r);
+  client.send('/oco/command', `G0 X${x} Y${y}`, () => {
+  console.log(`G0 X${x} Y${y}`)
+    if(count >= 100) {
+      client.close();
+    }
+    else {
+      let waitTime = 50;
+      if(count == 0) waitTime = 2000;
+      count++;
+      setTimeout(next, waitTime);
+    }
+  });
+}
+
+next();
