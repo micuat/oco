@@ -2,9 +2,13 @@
 #include "Ramps.h"
 #include "SerialCommand.h"
 
+#include <Servo.h>
+
 SerialCommand command;
 
 Ramps ramps = Ramps();
+
+Servo servo;
 
 void printPosition() {
   Serial.print(ramps.motorX.position);
@@ -20,9 +24,12 @@ void setup()
   Serial.begin(9600);
   Serial.println("started...");
 
-  command.addCommand("G28", homeX);
-  command.addCommand("G0", moveTo);
-  command.addCommand("G1", moveToRelative);
+  servo.attach(11);
+  
+  command.addCommand("home", homeX);
+  command.addCommand("moveToA", moveTo);
+  command.addCommand("moveToR", moveToRelative);
+  command.addCommand("servo", rotServo);
   delay(500);
 }
 
@@ -59,4 +66,13 @@ void moveToRelative() {
 
   ramps.moveToRelative(xPos, yPos, zPos, 30);
   printPosition();
+}
+
+
+void rotServo() {
+  char *arg;
+  arg = command.next();
+  int pos = min(max(0, atoi(arg)), 180);
+
+  servo.write(pos);
 }
