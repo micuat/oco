@@ -30,6 +30,9 @@ void setup()
   command.addCommand("moveToA", moveTo);
   command.addCommand("moveToR", moveToRelative);
   command.addCommand("servo", rotServo);
+  command.addCommand("clearX", clearX);
+  command.addCommand("clearY", clearY);
+  command.addCommand("clearZ", clearZ);
   delay(500);
 }
 
@@ -40,6 +43,22 @@ void loop()
 
 void homeX() {
   ramps.homeX(100);
+  clearX();
+}
+
+void clearX() {
+  ramps.motorX.position = 0;
+  printPosition();
+}
+
+void clearY() {
+  ramps.motorY.position = 0;
+  printPosition();
+}
+
+void clearZ() {
+  ramps.motorZ.position = 0;
+  printPosition();
 }
 
 void moveTo() {
