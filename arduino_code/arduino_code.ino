@@ -1,5 +1,8 @@
 #include "PololuDriver.h"
 #include "Ramps.h"
+#include "SerialCommand.h"
+
+SerialCommand command;
 
 Ramps ramps = Ramps();
 
@@ -16,25 +19,44 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("started...");
-  ramps.homeX(100);
-  delay(500);
-  ramps.moveToRelative(-30000, 2700, 1000, 30);
-  printPosition();
-  delay(500);
-  ramps.moveTo(0, 0, 0, 30);
-  printPosition();
-  delay(500);
-  ramps.moveToRelative(1000, 30000, 2101, 30);
-  printPosition();
-  delay(500);
-  ramps.moveToRelative(-17777, 1020, 3000, 30);
-  printPosition();
-  delay(500);
-  ramps.moveTo(1000, 1020, 3050, 30);
-  printPosition();
+
+  command.addCommand("G28", homeX);
+  command.addCommand("G0", moveTo);
+  command.addCommand("G1", moveToRelative);
   delay(500);
 }
 
 void loop()
 {
+  command.readSerial();
+}
+
+void homeX() {
+  ramps.homeX(100);
+}
+
+void moveTo() {
+  char *arg;
+  arg = command.next();
+  int xPos = atoi(arg);
+  arg = command.next();
+  int yPos = atoi(arg);
+  arg = command.next();
+  int zPos = atoi(arg);
+
+  ramps.moveTo(xPos, yPos, zPos, 30);
+  printPosition();
+}
+
+void moveToRelative() {
+  char *arg;
+  arg = command.next();
+  int xPos = atoi(arg);
+  arg = command.next();
+  int yPos = atoi(arg);
+  arg = command.next();
+  int zPos = atoi(arg);
+
+  ramps.moveToRelative(xPos, yPos, zPos, 30);
+  printPosition();
 }
