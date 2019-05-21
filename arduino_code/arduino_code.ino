@@ -21,7 +21,7 @@ void printPosition() {
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(250000);
   Serial.println("started...");
 
   servo.attach(11);
