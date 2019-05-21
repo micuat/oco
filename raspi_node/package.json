@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "node-osc": "^4.1.0",
-    "serialport": "^7.1.5"
+    "serialport": "^7.1.5",
+    "ws": "^7.0.0"
   },
   "devDependencies": {},
   "scripts": {
