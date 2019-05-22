@@ -3,6 +3,7 @@ import websockets.*;
 WebsocketClient wsc;
 int now;
 boolean isMessageSent = false;
+int drivingSteps = -1;
 int mult = 10;
 
 int realX = 0;
@@ -26,7 +27,7 @@ void draw() {
     line(trace[i], trace[i+1], trace[i+2], trace[i+3]);
   }
   ellipse(realX / mult, realY / mult, 20, 20);
-  if (isMessageSent == false) {
+  if (isMessageSent == false && drivingSteps < 0) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
       wsc.sendMessage("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " 0");
       now=millis();
@@ -54,10 +55,29 @@ void mouseReleased() {
   wsc.sendMessage("servo 0");
 }
 
+void keyPressed() {
+  if (key == ' ') {
+    if (isMessageSent == false) {
+      wsc.sendMessage("moveToA 0 0 0");
+      drivingSteps = 0;
+    }
+  }
+}
+
 void webSocketEvent(String msg) {
   isMessageSent = false;
 
   println(msg);
   realX = parseInt(msg.split(" ")[0]);
   realY = parseInt(msg.split(" ")[1]);
+
+  if (drivingSteps == 0) {
+    wsc.sendMessage("moveToA 0 10000 0");
+    drivingSteps = 1;
+    isMessageSent = true;
+  } else if (drivingSteps == 1) {
+    wsc.sendMessage("clearY");
+    drivingSteps = -1;
+    isMessageSent = true;
+  }
 }
