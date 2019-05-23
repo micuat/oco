@@ -58,7 +58,7 @@ void mouseReleased() {
 void keyPressed() {
   if (key == ' ') {
     if (isMessageSent == false) {
-      wsc.sendMessage("moveToA 0 0 0");
+      wsc.sendMessage("moveToA 0 " + (mouseY * mult) + " 0");
       drivingSteps = 0;
     }
   }
@@ -72,10 +72,14 @@ void webSocketEvent(String msg) {
   realY = parseInt(msg.split(" ")[1]);
 
   if (drivingSteps == 0) {
-    wsc.sendMessage("moveToA 0 10000 0");
+    wsc.sendMessage("clearY");
     drivingSteps = 1;
     isMessageSent = true;
   } else if (drivingSteps == 1) {
+    wsc.sendMessage("moveToA 0 10000 0");
+    drivingSteps = 2;
+    isMessageSent = true;
+  } else if (drivingSteps == 2) {
     wsc.sendMessage("clearY");
     drivingSteps = -1;
     isMessageSent = true;
