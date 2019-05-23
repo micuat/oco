@@ -1,7 +1,6 @@
 import websockets.*;
 
 WebsocketClient wsc;
-boolean isWaitingForReply = false;
 int mult = 10;
 
 int realX = 0;
@@ -16,9 +15,26 @@ int head = 0;
 
 class CommandQueue {
   ArrayList<String> commands = new ArrayList<String>();
+  boolean isWaitingForReply = false;
 
   void add(String s) {
     commands.add(s);
+  }
+
+  boolean isMessageSendable() {
+    return isWaitingForReply == false && isEmpty() == false;
+  }
+
+  boolean isMessageQueueable() {
+    return isWaitingForReply == false && isEmpty();
+  }
+
+  void messageJustSent() {
+    isWaitingForReply = true;
+  }
+
+  void messageReceived() {
+    isWaitingForReply = false;
   }
 
   boolean isEmpty() {
@@ -30,6 +46,13 @@ class CommandQueue {
       return commands.remove(0);
     } else return "";
   }
+
+  void sendNextMessage() {
+    if (isMessageSendable()) {
+      wsc.sendMessage(pop());
+      messageJustSent();
+    }
+  }
 }
 
 CommandQueue commandQueue = new CommandQueue();
@@ -39,20 +62,13 @@ void setup() {
   wsc= new WebsocketClient(this, "ws://192.168.1.237:8080/");
 }
 
-void sendNextMessage() {
-  if (isWaitingForReply == false && commandQueue.isEmpty() == false) {
-    wsc.sendMessage(commandQueue.pop());
-    isWaitingForReply = true;
-  }
-}
-
 void draw() {
   background(255);
   for (int i = 0; i < trace.length; i+= 4) {
     line(trace[i], trace[i+1], trace[i+2], trace[i+3]);
   }
   ellipse(realX / mult, realY / mult, 20, 20);
-  if (isWaitingForReply == false && commandQueue.isEmpty()) {
+  if (commandQueue.isMessageQueueable()) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
       commandQueue.add("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " 0");
 
@@ -68,7 +84,7 @@ void draw() {
       prevMouseY = mouseY;
     }
   }
-  sendNextMessage();
+  commandQueue.sendNextMessage();
 }
 
 void mousePressed() {
@@ -81,7 +97,7 @@ void mouseReleased() {
 
 void keyPressed() {
   if (key == ' ') {
-    if (isWaitingForReply == false) {
+    if (commandQueue.isMessageQueueable()) {
       commandQueue.add("moveToA 0 " + (mouseY * mult) + " 0");
       commandQueue.add("clearY");
       commandQueue.add("moveToA 0 10000 0");
@@ -91,7 +107,7 @@ void keyPressed() {
 }
 
 void webSocketEvent(String msg) {
-  isWaitingForReply = false;
+  commandQueue.messageReceived();
 
   println(msg);
   realX = parseInt(msg.split(" ")[0]);
