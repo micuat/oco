@@ -1,9 +1,7 @@
 import websockets.*;
 
 WebsocketClient wsc;
-int now;
-boolean isMessageSent = false;
-int drivingSteps = -1;
+boolean isWaitingForReply = false;
 int mult = 10;
 
 int realX = 0;
@@ -15,10 +13,37 @@ int prevMouseY = 0;
 int[] trace = new int[512];
 int head = 0;
 
+
+class CommandQueue {
+  ArrayList<String> commands = new ArrayList<String>();
+
+  void add(String s) {
+    commands.add(s);
+  }
+
+  boolean isEmpty() {
+    return commands.isEmpty();
+  }
+
+  String pop() {
+    if (commands.size() > 0) {
+      return commands.remove(0);
+    } else return "";
+  }
+}
+
+CommandQueue commandQueue = new CommandQueue();
+
 void setup() {
   size(800, 800);
   wsc= new WebsocketClient(this, "ws://192.168.1.237:8080/");
-  now=millis();
+}
+
+void sendNextMessage() {
+  if (isWaitingForReply == false && commandQueue.isEmpty() == false) {
+    wsc.sendMessage(commandQueue.pop());
+    isWaitingForReply = true;
+  }
 }
 
 void draw() {
@@ -27,11 +52,9 @@ void draw() {
     line(trace[i], trace[i+1], trace[i+2], trace[i+3]);
   }
   ellipse(realX / mult, realY / mult, 20, 20);
-  if (isMessageSent == false && drivingSteps < 0) {
+  if (isWaitingForReply == false && commandQueue.isEmpty()) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
-      wsc.sendMessage("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " 0");
-      now=millis();
-      isMessageSent = true;
+      commandQueue.add("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " 0");
 
       if (mousePressed) {
         trace[head++] = mouseX;
@@ -45,43 +68,32 @@ void draw() {
       prevMouseY = mouseY;
     }
   }
+  sendNextMessage();
 }
 
 void mousePressed() {
-  wsc.sendMessage("servo 100");
+  commandQueue.add("servo 100");
 }
 
 void mouseReleased() {
-  wsc.sendMessage("servo 0");
+  commandQueue.add("servo 0");
 }
 
 void keyPressed() {
   if (key == ' ') {
-    if (isMessageSent == false) {
-      wsc.sendMessage("moveToA 0 " + (mouseY * mult) + " 0");
-      drivingSteps = 0;
+    if (isWaitingForReply == false) {
+      commandQueue.add("moveToA 0 " + (mouseY * mult) + " 0");
+      commandQueue.add("clearY");
+      commandQueue.add("moveToA 0 10000 0");
+      commandQueue.add("clearY");
     }
   }
 }
 
 void webSocketEvent(String msg) {
-  isMessageSent = false;
+  isWaitingForReply = false;
 
   println(msg);
   realX = parseInt(msg.split(" ")[0]);
   realY = parseInt(msg.split(" ")[1]);
-
-  if (drivingSteps == 0) {
-    wsc.sendMessage("clearY");
-    drivingSteps = 1;
-    isMessageSent = true;
-  } else if (drivingSteps == 1) {
-    wsc.sendMessage("moveToA 0 10000 0");
-    drivingSteps = 2;
-    isMessageSent = true;
-  } else if (drivingSteps == 2) {
-    wsc.sendMessage("clearY");
-    drivingSteps = -1;
-    isMessageSent = true;
-  }
 }

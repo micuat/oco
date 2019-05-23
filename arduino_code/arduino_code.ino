@@ -94,4 +94,5 @@ void rotServo() {
   int pos = min(max(0, atoi(arg)), 180);
 
   servo.write(pos);
+  printPosition();
 }
