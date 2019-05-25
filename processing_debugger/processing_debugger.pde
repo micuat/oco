@@ -66,6 +66,10 @@ void setup() {
   wsc= new WebsocketClient(this, serverAddress);
 }
 
+String moveCommand(int x, int y, int z) {
+  return "moveToA " + x + " " + y + " " + z + " 30";
+}
+
 void draw() {
   background(255);
   for (int i = 0; i < trace.length; i+= 4) {
@@ -74,7 +78,7 @@ void draw() {
   ellipse(realX / mult, realY / mult, 20, 20);
   if (commandQueue.isMessageQueueable()) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
-      commandQueue.add("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " " + (mouseY * mult));
+      commandQueue.add(moveCommand(mouseX * mult, mouseY * mult, mouseY * mult));
 
       if (mousePressed) {
         trace[head++] = mouseX;
@@ -102,20 +106,20 @@ void mouseReleased() {
 void keyPressed() {
   if (key == 'w' || key == 'a' || key == 'd' || key == 'x' ) {
     if (commandQueue.isMessageQueueable()) {
-      commandQueue.add("moveToA 0 " + (mouseY * mult) + " " + (mouseY * mult));
+      commandQueue.add(moveCommand(0, mouseY * mult, mouseY * mult));
       commandQueue.add("clearY");
       commandQueue.add("clearZ");
       if(key == 'w') { // forward
-        commandQueue.add("moveToA 0 10000 10000");
+        commandQueue.add(moveCommand(0, 10000, 10000));
       }
       if(key == 'a') { // left ?
-        commandQueue.add("moveToA 0 -10000 10000");
+        commandQueue.add(moveCommand(0, -10000, 10000));
       }
       if(key == 'd') { // right ?
-        commandQueue.add("moveToA 0 10000 -10000");
+        commandQueue.add(moveCommand(0, 10000, -10000));
       }
       if(key == 'x') { // backward
-        commandQueue.add("moveToA 0 -10000 -10000");
+        commandQueue.add(moveCommand(0, -10000, -10000));
       }
       commandQueue.add("clearY");
       commandQueue.add("clearZ");

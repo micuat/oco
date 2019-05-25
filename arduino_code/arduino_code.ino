@@ -69,6 +69,8 @@ void moveTo() {
   int yPos = atoi(arg);
   arg = command.next();
   int zPos = atoi(arg);
+  arg = command.next();
+  int sp = atoi(arg);
 
 //  Serial.print("debug: ");
 //  Serial.print(xPos);
@@ -78,7 +80,7 @@ void moveTo() {
 //  Serial.print(zPos);
 //  Serial.println();
 
-  ramps.moveTo(xPos, yPos, zPos, 30);
+  ramps.moveTo(xPos, yPos, zPos, sp);
   printPosition();
 }
 
@@ -90,8 +92,10 @@ void moveToRelative() {
   int yPos = atoi(arg);
   arg = command.next();
   int zPos = atoi(arg);
+  arg = command.next();
+  int sp = atoi(arg);
 
-  ramps.moveToRelative(xPos, yPos, zPos, 30);
+  ramps.moveToRelative(xPos, yPos, zPos, sp);
   printPosition();
 }
 
