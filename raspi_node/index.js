@@ -35,11 +35,11 @@ wss.on('connection', function connection(ws) {
 port.pipe(parser)
 
 parser.on('data', line => {
-  if(line.trim() == "wait") {
-    process.stdout.write("|");
+  if(line.startsWith("debug")) {
+    console.log(`> ${line}`)
   }
   else {
-    console.log(`\n> ${line}`)
+    console.log(`> ${line}`)
     for(let ws of wslistners) {
       ws.send(line);
     }

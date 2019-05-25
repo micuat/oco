@@ -70,6 +70,14 @@ void moveTo() {
   arg = command.next();
   int zPos = atoi(arg);
 
+//  Serial.print("debug: ");
+//  Serial.print(xPos);
+//  Serial.print(" ");
+//  Serial.print(yPos);
+//  Serial.print(" ");
+//  Serial.print(zPos);
+//  Serial.println();
+
   ramps.moveTo(xPos, yPos, zPos, 30);
   printPosition();
 }

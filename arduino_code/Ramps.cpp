@@ -253,15 +253,16 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
         {
             //MotorZ zal altijd stappen
             motorZ.stepOn();
+            dispZ++;
 
-            if(motorZ.position * deltaX / deltaZ > motorX.position)
+            if(dispZ * deltaX / deltaZ > motorX.position)
             {
                 //motor X stapt
                 motorX.stepOn();
                 dispX++;
             }
 
-            if(motorZ.position * deltaY / deltaZ > dispY)
+            if(dispZ * deltaY / deltaZ > dispY)
             {
                 //motor Y stapt
                 motorY.stepOn();
