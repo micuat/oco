@@ -20,13 +20,14 @@ const wslistners = [];
 
 wss.on('connection', function connection(ws) {
   wslistners.push(ws);
+  console.log('client connected; number of clients: ' + wslistners.length)
   ws.on('message', function incoming(message) {
     console.log('execute: %s', message);
 
     port.write(`${message}\n`);
   });
   ws.on('close', _ => {
-    console.log('closed ws');
+    console.log('client disconnected');
     let index = wslistners.indexOf(ws);
     if (index != -1) wslistners.splice(index, 1);
   });
