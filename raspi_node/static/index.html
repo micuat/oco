@@ -1,22 +1,69 @@
 <html>
 
 <head>
+  <style>
+    body,
+    #container {
+      width: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    ul {
+      padding: 0px;
+      margin: 0px;
+      height: 100%;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0px;
+      width: 100%;
+      height: 25%;
+      font-size: 72px;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    #forward {
+      background: #8783d1;
+    }
+
+    #left {
+      background: #fca17d;
+    }
+
+    #right {
+      background: #da627d;
+    }
+
+    #backward {
+      background: #9a348e;
+    }
+  </style>
 </head>
 
 <body>
-  <a class="move" id="forward" href="javascript:void(0)">
-    forward
-  </a><br>
-  <a class="move" id="left" href="javascript:void(0)">
-    left
-  </a><br>
-  <a class="move" id="right" href="javascript:void(0)">
-    right
-  </a><br>
-  <a class="move" id="backward" href="javascript:void(0)">
-    backward
-  </a><br>
-
+  <div id="container">
+    <ul>
+      <li class="move" id="forward" href="javascript:void(0)">
+        <span id="child">FORWARD</span>
+      </li>
+      <li class="move" id="left" href="javascript:void(0)">
+        <span id="child">LEFT</span>
+      </li>
+      <li class="move" id="right" href="javascript:void(0)">
+        <span id="child">RIGHT</span>
+      </li>
+      <li class="move" id="backward" href="javascript:void(0)">
+        <span id="child">BACKWARD</span>
+      </li>
+    </ul>
+  </div>
 
   <script src="./jquery-3.4.1.min.js"></script>
   <script>
