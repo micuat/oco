@@ -8,13 +8,21 @@ function loadSettings() {
 
 const settings = loadSettings();
 
-const port = new SerialPort(settings.serialPort, { baudRate: 250000 })
+const port = new SerialPort(settings.serialPort, { baudRate: settings.baudRate })
+
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+app.use('/', express.static('static'));
+http.listen(settings.httpPort, () => {
+  console.log('listening on *:' + settings.httpPort);
+});
 
 const parser = new Readline()
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: settings.wsPort });
 
 const wslistners = [];
 
