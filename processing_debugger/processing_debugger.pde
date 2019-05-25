@@ -96,22 +96,23 @@ void mouseReleased() {
 }
 
 void keyPressed() {
-  if (key == ' ') {
+  if (key == 'w' || key == 'a' || key == 'd' || key == 'x' ) {
     if (commandQueue.isMessageQueueable()) {
       commandQueue.add("moveToA 0 " + (mouseY * mult) + " " + (mouseY * mult));
       commandQueue.add("clearY");
       commandQueue.add("clearZ");
-      commandQueue.add("moveToA 0 10000 10000");
-      commandQueue.add("clearY");
-      commandQueue.add("clearZ");
-    }
-  }
-  if (key == 'r') { // rotate
-    if (commandQueue.isMessageQueueable()) {
-      commandQueue.add("moveToA 0 " + (mouseY * mult) + " " + (mouseY * mult));
-      commandQueue.add("clearY");
-      commandQueue.add("clearZ");
-      commandQueue.add("moveToA 0 10000 -10000");
+      if(key == 'w') { // forward
+        commandQueue.add("moveToA 0 10000 10000");
+      }
+      if(key == 'a') { // left ?
+        commandQueue.add("moveToA 0 -10000 10000");
+      }
+      if(key == 'd') { // right ?
+        commandQueue.add("moveToA 0 10000 -10000");
+      }
+      if(key == 'x') { // backward
+        commandQueue.add("moveToA 0 -10000 -10000");
+      }
       commandQueue.add("clearY");
       commandQueue.add("clearZ");
     }
