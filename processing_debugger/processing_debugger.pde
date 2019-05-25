@@ -1,7 +1,7 @@
 import websockets.*;
 
 WebsocketClient wsc;
-int mult = 10;
+int mult = 20;
 
 int realX = 0;
 int realY = 0;
@@ -67,7 +67,7 @@ void setup() {
 }
 
 String moveCommand(int x, int y, int z) {
-  return "moveToA " + x + " " + y + " " + z + " 30";
+  return "moveToA " + x + " " + y + " " + z + " 200";
 }
 
 void draw() {
