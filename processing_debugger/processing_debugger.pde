@@ -59,7 +59,11 @@ CommandQueue commandQueue = new CommandQueue();
 
 void setup() {
   size(800, 800);
-  wsc= new WebsocketClient(this, "ws://192.168.4.1:8080/");
+  
+  JSONObject json = loadJSONObject("settings.json");
+
+  String serverAddress = json.getString("serverAddress");
+  wsc= new WebsocketClient(this, serverAddress);
 }
 
 void draw() {
