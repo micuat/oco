@@ -1,6 +1,14 @@
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
-const port = new SerialPort("/dev/ttyACM0", { baudRate: 250000 })
+
+function loadSettings() {
+  const fs = require("fs");
+  return JSON.parse(fs.readFileSync("settings.json"));
+}
+
+const settings = loadSettings();
+
+const port = new SerialPort(settings.serialPort, { baudRate: 250000 })
 
 const parser = new Readline()
 
