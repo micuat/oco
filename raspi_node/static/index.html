@@ -1,5 +1,113 @@
 <html>
-  <body>
-    hello world
-  </body>
+
+<head>
+</head>
+
+<body>
+  <a class="move" id="forward" href="javascript:void(0)">
+    forward
+  </a><br>
+  <a class="move" id="left" href="javascript:void(0)">
+    left
+  </a><br>
+  <a class="move" id="right" href="javascript:void(0)">
+    right
+  </a><br>
+  <a class="move" id="backward" href="javascript:void(0)">
+    backward
+  </a><br>
+
+
+  <script src="./jquery-3.4.1.min.js"></script>
+  <script>
+    // Create WebSocket connection.
+    const socket = new WebSocket('ws://' + window.location.hostname + ':8080');
+
+    class CommandQueue {
+      constructor() {
+        this.queue = [];
+        this.isWaitingForReply = false;
+      }
+      add(m) {
+        this.queue.push(m);
+      }
+      isMessageSendable() {
+        return this.isWaitingForReply == false && this.isEmpty() == false;
+      }
+      isMessageQueueable() {
+        return this.isWaitingForReply == false && this.isEmpty();
+      }
+      messageJustSent() {
+        this.isWaitingForReply = true;
+      }
+      messageReceived() {
+        this.isWaitingForReply = false;
+      }
+      isEmpty() {
+        return this.queue.length == 0;
+      }
+      pop() {
+        return this.queue.shift();
+      }
+      next() {
+        if (this.isMessageSendable()) {
+          socket.send(this.pop());
+          this.messageJustSent();
+        }
+      }
+    }
+    const cq = new CommandQueue();
+
+    function moveCommand(x, y, z) {
+      return "moveToA " + x + " " + y + " " + z + " 200";
+    }
+
+    setInterval(() => {
+      cq.next();
+    }, 100);
+
+    $("#forward").on("click", () => {
+      cq.add("clearY");
+      cq.add("clearZ");
+      cq.add(moveCommand(0, 10000, 10000));
+      cq.add("clearY");
+      cq.add("clearZ");
+    });
+
+    $("#left").on("click", () => {
+      cq.add("clearY");
+      cq.add("clearZ");
+      cq.add(moveCommand(0, -10000, 10000));
+      cq.add("clearY");
+      cq.add("clearZ");
+    });
+
+    $("#right").on("click", () => {
+      cq.add("clearY");
+      cq.add("clearZ");
+      cq.add(moveCommand(0, 10000, -10000));
+      cq.add("clearY");
+      cq.add("clearZ");
+    });
+
+    $("#backward").on("click", () => {
+      cq.add("clearY");
+      cq.add("clearZ");
+      cq.add(moveCommand(0, -10000, -10000));
+      cq.add("clearY");
+      cq.add("clearZ");
+    });
+
+    // Connection opened
+    socket.addEventListener('open', (event) => {
+    });
+
+    // Listen for messages
+    socket.addEventListener('message', (event) => {
+      console.log('Message from server ', event.data);
+      cq.messageReceived();
+    });
+  </script>
+</body>
+
 </html>
