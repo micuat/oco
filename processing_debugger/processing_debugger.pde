@@ -59,7 +59,7 @@ CommandQueue commandQueue = new CommandQueue();
 
 void setup() {
   size(800, 800);
-  wsc= new WebsocketClient(this, "ws://192.168.1.237:8080/");
+  wsc= new WebsocketClient(this, "ws://192.168.4.1:8080/");
 }
 
 void draw() {
@@ -70,7 +70,7 @@ void draw() {
   ellipse(realX / mult, realY / mult, 20, 20);
   if (commandQueue.isMessageQueueable()) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
-      commandQueue.add("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " 0");
+      commandQueue.add("moveToA " + (mouseX * mult) + " " + (mouseY * mult) + " " + (mouseY * mult));
 
       if (mousePressed) {
         trace[head++] = mouseX;
@@ -98,10 +98,27 @@ void mouseReleased() {
 void keyPressed() {
   if (key == ' ') {
     if (commandQueue.isMessageQueueable()) {
-      commandQueue.add("moveToA 0 " + (mouseY * mult) + " 0");
+      commandQueue.add("moveToA 0 " + (mouseY * mult) + " " + (mouseY * mult));
       commandQueue.add("clearY");
-      commandQueue.add("moveToA 0 10000 0");
+      commandQueue.add("clearZ");
+      commandQueue.add("moveToA 0 10000 10000");
       commandQueue.add("clearY");
+      commandQueue.add("clearZ");
+    }
+  }
+  if (key == 'r') { // rotate
+    if (commandQueue.isMessageQueueable()) {
+      commandQueue.add("moveToA 0 " + (mouseY * mult) + " " + (mouseY * mult));
+      commandQueue.add("clearY");
+      commandQueue.add("clearZ");
+      commandQueue.add("moveToA 0 10000 -10000");
+      commandQueue.add("clearY");
+      commandQueue.add("clearZ");
+    }
+  }
+  if (key == 'h') {
+    if (commandQueue.isMessageQueueable()) {
+      commandQueue.add("home");
     }
   }
 }
