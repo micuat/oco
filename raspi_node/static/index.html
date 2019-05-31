@@ -22,18 +22,18 @@
       justify-content: center;
       margin: 0px;
       width: 100%;
-      height: 25%;
+      height: 16.667%;
       font-size: 72px;
       font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
       color: #ffffff;
       text-align: center;
     }
 
-    #forward {
+    #forward, #start {
       background: #8783d1;
     }
 
-    #left {
+    #left, #stop {
       background: #fca17d;
     }
 
@@ -61,6 +61,12 @@
       </li>
       <li class="move" id="backward" href="javascript:void(0)">
         <span id="child">BACKWARD</span>
+      </li>
+      <li class="move" id="start" href="javascript:void(0)">
+        <span id="child">START DANCING</span>
+      </li>
+      <li class="move" id="stop" href="javascript:void(0)">
+        <span id="child">STOP DANCING</span>
       </li>
     </ul>
   </div>
@@ -143,6 +149,26 @@
       cq.add(moveCommand(0, -10000, -10000));
       cq.add("clearY");
       cq.add("clearZ");
+    });
+
+    let intervalHandler;
+    $("#start").on("click", () => {
+      console.log("starting");
+      intervalHandler = setInterval(() => {
+        cq.add("clearY");
+        cq.add("clearZ");
+        cq.add(moveCommand(0, -10000, -10000));
+        cq.add("clearY");
+        cq.add("clearZ");
+      }, 5000);
+    });
+
+    $("#stop").on("click", () => {
+      if(intervalHandler != undefined) {
+        console.log("stopping");
+        clearInterval(intervalHandler);
+        intervalHandler = undefined;
+      }
     });
 
     // Connection opened
