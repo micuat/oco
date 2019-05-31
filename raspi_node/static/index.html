@@ -152,15 +152,19 @@
     });
 
     let intervalHandler;
+    let direction = 1;
     $("#start").on("click", () => {
-      console.log("starting");
-      intervalHandler = setInterval(() => {
-        cq.add("clearY");
-        cq.add("clearZ");
-        cq.add(moveCommand(0, -10000, -10000));
-        cq.add("clearY");
-        cq.add("clearZ");
-      }, 5000);
+      if(intervalHandler == undefined) {
+        console.log("starting");
+        intervalHandler = setInterval(() => {
+          cq.add("clearY");
+          cq.add("clearZ");
+          cq.add(moveCommand(0, 10000 * direction, 10000 * direction));
+          cq.add("clearY");
+          cq.add("clearZ");
+          direction *= -1;
+        }, 5000);
+      }
     });
 
     $("#stop").on("click", () => {
