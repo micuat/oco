@@ -19,8 +19,13 @@ void printPosition() {
   Serial.println("");
 }
 
+int pin_12v = 10;
+
 void setup()
 {
+  pinMode(pin_12v, OUTPUT);
+  digitalWrite(pin_12v, HIGH);   // turn the LED on (HIGH is the voltage level)
+
   Serial.begin(250000);
   Serial.println("started...");
 
