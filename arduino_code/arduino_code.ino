@@ -2,13 +2,14 @@
 #include "Ramps.h"
 #include "SerialCommand.h"
 
-#include <Servo.h>
+#include <SoftwareSerial.h>
+#include "MeAuriga.h"
+
+MeSmartServo mysmartservo(PORT5); // somehow goes to tx2/rx2 of mega
 
 SerialCommand command;
 
 Ramps ramps = Ramps();
-
-Servo servo;
 
 void printPosition() {
   Serial.print(ramps.motorX.position);
@@ -26,10 +27,14 @@ void setup()
   pinMode(pin_12v, OUTPUT);
   digitalWrite(pin_12v, HIGH);   // turn the LED on (HIGH is the voltage level)
 
+  mysmartservo.begin(115200);
+  delay(5);
+  mysmartservo.assignDevIdRequest();
+  delay(50);
+  mysmartservo.moveTo(0,0,50);
+
   Serial.begin(250000);
   Serial.println("started...");
-
-  servo.attach(11);
   
   command.addCommand("home", homeX);
   command.addCommand("moveToA", moveTo);
@@ -108,8 +113,8 @@ void moveToRelative() {
 void rotServo() {
   char *arg;
   arg = command.next();
-  int pos = min(max(0, atoi(arg)), 180);
+  int pos = min(max(0, atoi(arg)), 360);
 
-  servo.write(pos);
+  mysmartservo.moveTo(0,-pos,50);
   printPosition();
 }
