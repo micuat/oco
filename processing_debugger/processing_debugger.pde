@@ -96,7 +96,7 @@ void draw() {
 }
 
 void mousePressed() {
-  commandQueue.add("servo 100");
+  commandQueue.add("servo 60");
 }
 
 void mouseReleased() {
@@ -130,8 +130,15 @@ void keyPressed() {
       commandQueue.add("home");
     }
   }
+  if(key >= '1' && key <= '9') {
+    commandQueue.add("servo " + ((key - '0') * 10));
+  }
 }
-
+void keyReleased() {
+  if(key >= '1' && key <= '9') {
+    commandQueue.add("servo 0");
+  }
+}
 void webSocketEvent(String msg) {
   commandQueue.messageReceived();
 

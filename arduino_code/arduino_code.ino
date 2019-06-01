@@ -20,12 +20,15 @@ void printPosition() {
   Serial.println("");
 }
 
-int pin_12v = 10;
+int pin_12v0 = 10;
+int pin_12v1 = 9;
 
 void setup()
 {
-  pinMode(pin_12v, OUTPUT);
-  digitalWrite(pin_12v, HIGH);   // turn the LED on (HIGH is the voltage level)
+  pinMode(pin_12v0, OUTPUT);
+  pinMode(pin_12v1, OUTPUT);
+  digitalWrite(pin_12v0, HIGH);
+  digitalWrite(pin_12v1, HIGH);
 
   mysmartservo.begin(115200);
   delay(5);
