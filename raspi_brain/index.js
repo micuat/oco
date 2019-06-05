@@ -47,3 +47,15 @@ class BumperManager {
 }
 
 const bm = new BumperManager();
+
+process.stdin.setRawMode = true;
+process.stdin.resume();
+process.stdin.on('data', (data) => {
+  const byteArray = [...data]
+  if (byteArray.length > 0 && byteArray[0] === 48) {
+    bm.interrupt('0');
+  }
+  if (byteArray.length > 0 && byteArray[0] === 49) {
+    bm.interrupt('1');
+  }
+});
