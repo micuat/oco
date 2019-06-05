@@ -1,0 +1,17 @@
+{
+  "name": "raspi_brain",
+  "version": "1.0.0",
+  "description": "for oco project",
+  "main": "index.js",
+  "dependencies": {
+    "pigpio": "^1.2.2",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "naoto hieda",
+  "license": "MIT"
+}
