@@ -34,10 +34,10 @@ const { exec } = require('child_process');
 
 const position = { x: 0, y: 0, z: 0 };
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', (ws) => {
   wslistners.push(ws);
   console.log('client connected; number of clients: ' + wslistners.length)
-  ws.on('message', function incoming(message) {
+  ws.on('message', (message) => {
     if (message == 'dance') {
       exec('node /home/pi/oco/raspi_node/wsclient.js', (err, stdout, stderr) => {
         console.log(`stdout: ${stdout}`);

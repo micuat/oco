@@ -1,4 +1,4 @@
-function loadSettings() {
+const loadSettings = () => {
   const fs = require("fs");
   return JSON.parse(fs.readFileSync("settings.json"));
 }
@@ -86,7 +86,13 @@ class CommandQueue {
     this.queue.push(m);
   }
   addMoveCommand(x, y, z) {
+  }
+  addMove(x, y, z) {
+    this.add("clearY");
+    this.add("clearZ");
     this.add(this.moveCommand(x, y, z));
+    this.add("clearY");
+    this.add("clearZ");
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -115,29 +121,21 @@ class CommandQueue {
 }
 const cq = new CommandQueue();
 
-const addMove = (x, y, z) => {
-  cq.add("clearY");
-  cq.add("clearZ");
-  cq.addMoveCommand(x, y, z);
-  cq.add("clearY");
-  cq.add("clearZ");
-}
-
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('client', (msg) => {
     console.log('message: ' + msg);
-    if(msg.command == 'drive') {
-      addMove(0, msg.steps, msg.steps);
+    if (msg.command == 'drive') {
+      cq.addMove(0, msg.steps, msg.steps);
     }
-    if(msg.command == 'driveTillHit') {
+    if (msg.command == 'driveTillHit') {
       const steps = 1000;
-      addMove(0, steps, steps);
+      cq.addMove(0, steps, steps);
     }
   });
 });
 
-ws.on('message', function incoming(data) {
+ws.on('message', (data) => {
   console.log(data);
   cq.messageReceived();
 });
