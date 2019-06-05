@@ -26,13 +26,23 @@ const wss = new WebSocket.Server({ port: settings.wsPort });
 
 const wslistners = [];
 
+const { exec } = require('child_process');
+
 wss.on('connection', function connection(ws) {
   wslistners.push(ws);
   console.log('client connected; number of clients: ' + wslistners.length)
   ws.on('message', function incoming(message) {
-    console.log('execute: %s', message);
+    if(message == 'dance') {
+      exec('node /home/pi/oco/raspi_node/wsclient.js', (err, stdout, stderr) => {
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+      });
+    }
+    else {
+      console.log('execute: %s', message);
 
-    port.write(`${message}\n`);
+      port.write(`${message}\n`);
+    }
   });
   ws.on('close', _ => {
     console.log('client disconnected');
