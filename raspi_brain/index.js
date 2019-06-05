@@ -8,9 +8,14 @@ const settings = loadSettings();
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 app.use('/', express.static('static'));
 http.listen(settings.httpPort, () => {
   console.log('listening on *:' + settings.httpPort);
+});
+io.on('connection', function(socket){
+  console.log('a user connected');
 });
 
 try {
@@ -47,15 +52,18 @@ class BumperManager {
     if(level == '1' && this.isOnWall == false) {
       if(t - this.lastTime < this.hitThreshold) {
         console.log('misdetection');
+        io.emit('bumper', { status: 'misdetection' });
       }
       else {
         console.log('hit');
+        io.emit('bumper', { status: 'hit' });
         this.isOnWall = true;
         this.lastTime = t;
       }
     }
     else if(level == '0' && this.isOnWall == true) {
       console.log('released');
+      io.emit('bumper', { status: 'released' });
       this.isOnWall = false;
     }
   }

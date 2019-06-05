@@ -18,7 +18,31 @@
   <script src="./jquery-3.4.1.min.js"></script>
   <script src="./p5.min.js"></script>
   <script src="./p5.dom.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script>
+    const socket = io();
+
+    function setup() {
+      createCanvas(800, 400);
+    }
+
+    let bumper = {status: ''};
+    function draw() {
+      let bg;
+      if(bumper.status == 'hit') {
+        bg = [255, 0, 0];
+      }
+      else if(bumper.status == 'released') {
+        bg = [0, 255, 0];
+      }
+      else
+        bg = [0, 0, 0];
+      background(bg[0], bg[1], bg[2]);
+    }
+    socket.on('bumper', (msg) => {
+      console.log(msg)
+      bumper = msg;
+    });
   </script>
 </body>
 
