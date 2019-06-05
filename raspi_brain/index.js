@@ -1,3 +1,18 @@
+function loadSettings() {
+  const fs = require("fs");
+  return JSON.parse(fs.readFileSync("settings.json"));
+}
+
+const settings = loadSettings();
+
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+app.use('/', express.static('static'));
+http.listen(settings.httpPort, () => {
+  console.log('listening on *:' + settings.httpPort);
+});
+
 try {
   var Gpio = require('pigpio').Gpio;
 } catch (er) {

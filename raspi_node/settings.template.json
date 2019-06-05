@@ -1,6 +1,6 @@
 {
   "serialPort": "/dev/ttyACM0",
   "baudRate": 250000,
-  "httpPort": 80,
+  "httpPort": 1080,
   "wsPort": 8080
 }
