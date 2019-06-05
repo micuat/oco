@@ -75,9 +75,18 @@ class CommandQueue {
   constructor() {
     this.queue = [];
     this.isWaitingForReply = false;
+    this.handler = setInterval(() => {
+      this.next();
+    }, 10);
+  }
+  moveCommand(x, y, z) {
+    return "moveToA " + x + " " + y + " " + z + " 200";
   }
   add(m) {
     this.queue.push(m);
+  }
+  addMoveCommand(x, y, z) {
+    this.add(this.moveCommand(x, y, z));
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -106,25 +115,25 @@ class CommandQueue {
 }
 const cq = new CommandQueue();
 
-function moveCommand(x, y, z) {
-  return "moveToA " + x + " " + y + " " + z + " 200";
+const addMove = (x, y, z) => {
+  cq.add("clearY");
+  cq.add("clearZ");
+  cq.addMoveCommand(x, y, z);
+  cq.add("clearY");
+  cq.add("clearZ");
 }
-setInterval(() => {
-  cq.next();
-}, 10);
-
 
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('client', (msg) => {
     console.log('message: ' + msg);
     if(msg.command == 'drive') {
-      cq.add("clearY");
-      cq.add("clearZ");
-      cq.add(moveCommand(0, msg.steps, msg.steps));
-      cq.add("clearY");
-      cq.add("clearZ");
-      }
+      addMove(0, msg.steps, msg.steps);
+    }
+    if(msg.command == 'driveTillHit') {
+      const steps = 1000;
+      addMove(0, steps, steps);
+    }
   });
 });
 
