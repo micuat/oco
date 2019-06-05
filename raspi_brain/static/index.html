@@ -22,17 +22,22 @@
   <script>
     const socket = io();
 
+    let driveButton;
     function setup() {
       createCanvas(800, 400);
+      driveButton = createButton('drive');
+      driveButton.mousePressed(() => {
+        socket.emit('client', { command: 'drive', steps: 1000 })
+      });
     }
 
-    let bumper = {status: ''};
+    let bumper = { status: '' };
     function draw() {
       let bg;
-      if(bumper.status == 'hit') {
+      if (bumper.status == 'hit') {
         bg = [255, 0, 0];
       }
-      else if(bumper.status == 'released') {
+      else if (bumper.status == 'released') {
         bg = [0, 255, 0];
       }
       else

@@ -5,6 +5,9 @@ function loadSettings() {
 
 const settings = loadSettings();
 
+const WebSocket = require('ws');
+const ws = new WebSocket('ws://127.0.0.1:8080');
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -14,9 +17,6 @@ app.use('/', express.static('static'));
 http.listen(settings.httpPort, () => {
   console.log('listening on *:' + settings.httpPort);
 });
-io.on('connection', function(socket){
-  console.log('a user connected');
-});
 
 try {
   var Gpio = require('pigpio').Gpio;
@@ -25,7 +25,7 @@ try {
   console.log('skipping GPIO');
 }
 
-if(Gpio) {
+if (Gpio) {
   const button = new Gpio(6, {
     mode: Gpio.INPUT,
     pullUpDown: Gpio.PUD_DOWN,
@@ -37,20 +37,20 @@ if(Gpio) {
 }
 
 class BumperManager {
-  constructor () {
+  constructor() {
     this.isOnWall = false;
     this.lastTime = this.getMillis();
     this.hitThreshold = 100;
   }
 
-  getMillis () {
+  getMillis() {
     return Date.now();
   }
 
-  interrupt (level) {
+  interrupt(level) {
     const t = this.getMillis();
-    if(level == '1' && this.isOnWall == false) {
-      if(t - this.lastTime < this.hitThreshold) {
+    if (level == '1' && this.isOnWall == false) {
+      if (t - this.lastTime < this.hitThreshold) {
         console.log('misdetection');
         io.emit('bumper', { status: 'misdetection' });
       }
@@ -61,7 +61,7 @@ class BumperManager {
         this.lastTime = t;
       }
     }
-    else if(level == '0' && this.isOnWall == true) {
+    else if (level == '0' && this.isOnWall == true) {
       console.log('released');
       io.emit('bumper', { status: 'released' });
       this.isOnWall = false;
@@ -70,6 +70,68 @@ class BumperManager {
 }
 
 const bm = new BumperManager();
+
+class CommandQueue {
+  constructor() {
+    this.queue = [];
+    this.isWaitingForReply = false;
+  }
+  add(m) {
+    this.queue.push(m);
+  }
+  isMessageSendable() {
+    return this.isWaitingForReply == false && this.isEmpty() == false;
+  }
+  isMessageQueueable() {
+    return this.isWaitingForReply == false && this.isEmpty();
+  }
+  messageJustSent() {
+    this.isWaitingForReply = true;
+  }
+  messageReceived() {
+    this.isWaitingForReply = false;
+  }
+  isEmpty() {
+    return this.queue.length == 0;
+  }
+  pop() {
+    return this.queue.shift();
+  }
+  next() {
+    if (this.isMessageSendable()) {
+      ws.send(this.pop());
+      this.messageJustSent();
+    }
+  }
+}
+const cq = new CommandQueue();
+
+function moveCommand(x, y, z) {
+  return "moveToA " + x + " " + y + " " + z + " 200";
+}
+setInterval(() => {
+  cq.next();
+}, 10);
+
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('client', (msg) => {
+    console.log('message: ' + msg);
+    if(msg.command == 'drive') {
+      cq.add("clearY");
+      cq.add("clearZ");
+      cq.add(moveCommand(0, msg.steps, msg.steps));
+      cq.add("clearY");
+      cq.add("clearZ");
+      }
+  });
+});
+
+ws.on('message', function incoming(data) {
+  console.log(data);
+  cq.messageReceived();
+});
 
 process.stdin.setRawMode = true;
 process.stdin.resume();
