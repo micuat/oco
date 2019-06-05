@@ -8,7 +8,11 @@ function loadSettings() {
 
 const settings = loadSettings();
 
-const port = new SerialPort(settings.serialPort, { baudRate: settings.baudRate })
+let portOpened = true;
+const port = new SerialPort(settings.serialPort, { baudRate: settings.baudRate }, (err) => {
+  console.log(err)
+  portOpened = false;
+})
 
 const express = require('express');
 const app = express();
@@ -28,11 +32,13 @@ const wslistners = [];
 
 const { exec } = require('child_process');
 
+const position = { x: 0, y: 0, z: 0 };
+
 wss.on('connection', function connection(ws) {
   wslistners.push(ws);
   console.log('client connected; number of clients: ' + wslistners.length)
   ws.on('message', function incoming(message) {
-    if(message == 'dance') {
+    if (message == 'dance') {
       exec('node /home/pi/oco/raspi_node/wsclient.js', (err, stdout, stderr) => {
         console.log(`stdout: ${stdout}`);
         console.log(`stderr: ${stderr}`);
@@ -40,8 +46,13 @@ wss.on('connection', function connection(ws) {
     }
     else {
       console.log('execute: %s', message);
-
       port.write(`${message}\n`);
+
+      if (portOpened == false) {
+        for (let ws of wslistners) {
+          ws.send(`${position.x} ${position.y} ${position.z}`);
+        }
+      }
     }
   });
   ws.on('close', _ => {
@@ -54,12 +65,12 @@ wss.on('connection', function connection(ws) {
 port.pipe(parser)
 
 parser.on('data', line => {
-  if(line.startsWith("debug")) {
+  if (line.startsWith("debug")) {
     console.log(`> ${line}`)
   }
   else {
     console.log(`> ${line}`)
-    for(let ws of wslistners) {
+    for (let ws of wslistners) {
       ws.send(line);
     }
   }
