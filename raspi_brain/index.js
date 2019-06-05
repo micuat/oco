@@ -1,11 +1,20 @@
-const Gpio = require('pigpio').Gpio;
+try {
+  var Gpio = require('pigpio').Gpio;
+} catch (er) {
+  Gpio = null;
+  console.log('skipping GPIO');
+}
 
-const button = new Gpio(6, {
-  mode: Gpio.INPUT,
-  pullUpDown: Gpio.PUD_DOWN,
-  edge: Gpio.EITHER_EDGE
-});
-
+if(Gpio) {
+  const button = new Gpio(6, {
+    mode: Gpio.INPUT,
+    pullUpDown: Gpio.PUD_DOWN,
+    edge: Gpio.EITHER_EDGE
+  });
+  button.on('interrupt', (level) => {
+    bm.interrupt(level);
+  });
+}
 
 class BumperManager {
   constructor () {
@@ -38,7 +47,3 @@ class BumperManager {
 }
 
 const bm = new BumperManager();
-
-button.on('interrupt', (level) => {
-  bm.interrupt(level);
-});

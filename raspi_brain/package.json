@@ -4,8 +4,10 @@
   "description": "for oco project",
   "main": "index.js",
   "dependencies": {
-    "pigpio": "^1.2.2",
     "ws": "^7.0.0"
+  },
+  "optionalDependencies": {
+    "pigpio": "^1.2.2"
   },
   "devDependencies": {},
   "scripts": {
