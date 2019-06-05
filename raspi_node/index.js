@@ -49,6 +49,21 @@ wss.on('connection', function connection(ws) {
       port.write(`${message}\n`);
 
       if (portOpened == false) {
+        const commands = message.split(' ');
+        if (commands[0] == 'moveToA') {
+          position.x = commands[1];
+          position.y = commands[2];
+          position.z = commands[3];
+        }
+        if (commands[0] == 'clearX') {
+          position.x = 0;
+        }
+        if (commands[0] == 'clearY') {
+          position.y = 0;
+        }
+        if (commands[0] == 'clearZ') {
+          position.z = 0;
+        }
         for (let ws of wslistners) {
           ws.send(`${position.x} ${position.y} ${position.z}`);
         }
