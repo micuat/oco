@@ -37,6 +37,47 @@ if (Gpio) {
   });
 }
 
+class Point {
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+  }
+  add(p0) {
+    const p = new Point();
+    p.x = this.x + p0.x;
+    p.y = this.y + p0.y;
+    return p;
+  }
+}
+
+class World {
+  constructor() {
+    this.relative = new Point();
+    this.origin = new Point();
+    this.angle = 0;
+  }
+
+  clearX() {
+    this.origin.x += this.relative.x;
+    this.relative.x = 0;
+  }
+  clearY() {
+    this.origin.y += this.relative.y;
+    this.relative.y = 0;
+  }
+  clearZ() {
+  }
+  moveToA(x, y, z) {
+    this.relative.x = x;
+    this.relative.y = y;
+  }
+  getPosition() {
+    return this.relative.add(this.origin);
+  }
+}
+
+const world = new World();
+
 class BumperManager {
   constructor() {
     this.isOnWall = false;
@@ -82,23 +123,23 @@ class CommandQueue {
     this.handler = setInterval(() => {
       this.next();
     }, 10);
-    this.scale = 10;
+    this.scale = 1;
   }
   moveCommand(x, y, z) {
-    return "moveToA " + x + " " + y + " " + z + " 200";
+    return ["moveToA", x, y, z, "200"];
   }
   add(m) {
     this.queue.push(m);
   }
   addMove(x, y, z) {
-    this.add("clearY");
-    this.add("clearZ");
+    // this.add(["clearY"]);
+    // this.add(["clearZ"]);
     this.add(this.moveCommand(x, y, z));
-    this.add("clearY");
-    this.add("clearZ");
+    this.add(["clearY"]);
+    this.add(["clearZ"]);
   }
   addPoints(index) {
-    for(const p of points[index]) {
+    for (const p of points[index]) {
       let x = parseInt(Math.floor(p.x * this.scale));
       let y = parseInt(Math.floor(p.y * this.scale));
       this.add(this.moveCommand(x, y, y));
@@ -129,10 +170,25 @@ class CommandQueue {
   }
   next() {
     if (this.isMessageSendable()) {
-      ws.send(this.pop());
+      const command = this.pop();
+      if(command[0] == "clearX") {
+        world.clearX();
+      }
+      if(command[0] == "clearY") {
+        world.clearY();
+      }
+      if(command[0] == "clearZ") {
+        world.clearZ();
+      }
+      if(command[0] == "moveToA") {
+        world.moveToA(command[1], command[2], command[3]);
+      }
+      const p = world.getPosition();
+      io.emit('world', { x: p.x, y: p.y });
+      ws.send(command.join(' '));
       this.messageJustSent();
     }
-    if(this.isEmpty() && this.driveTillHitFlag) {
+    if (this.isEmpty() && this.driveTillHitFlag) {
       this.addMove(0, this.driveSteps, this.driveSteps);
     }
   }
