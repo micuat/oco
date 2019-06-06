@@ -22,7 +22,7 @@
   <script>
     const socket = io();
 
-    let driveButton, driveTillHitButton;
+    let driveButton, driveTillHitButton, letterButton;
     function setup() {
       createCanvas(800, 400);
       driveButton = createButton('drive');
@@ -32,6 +32,10 @@
       driveTillHitButton = createButton('drive till hit');
       driveTillHitButton.mousePressed(() => {
         socket.emit('client', { command: 'driveTillHit' })
+      });
+      letterButton = createButton('letter');
+      letterButton.mousePressed(() => {
+        socket.emit('client', { command: 'letter', index: parseInt(Math.random() * 4) })
       });
     }
 

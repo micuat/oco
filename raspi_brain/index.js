@@ -1,9 +1,10 @@
-const loadSettings = () => {
-  const fs = require("fs");
-  return JSON.parse(fs.readFileSync("settings.json"));
+const fs = require("fs");
+const loadJson = (f) => {
+  return JSON.parse(fs.readFileSync(f));
 }
 
-const settings = loadSettings();
+const settings = loadJson("settings.json");
+const points = loadJson("points.json");
 
 const WebSocket = require('ws');
 const ws = new WebSocket('ws://127.0.0.1:8080');
@@ -81,6 +82,7 @@ class CommandQueue {
     this.handler = setInterval(() => {
       this.next();
     }, 10);
+    this.scale = 10;
   }
   moveCommand(x, y, z) {
     return "moveToA " + x + " " + y + " " + z + " 200";
@@ -94,6 +96,13 @@ class CommandQueue {
     this.add(this.moveCommand(x, y, z));
     this.add("clearY");
     this.add("clearZ");
+  }
+  addPoints(index) {
+    for(const p of points[index]) {
+      let x = parseInt(Math.floor(p.x * this.scale));
+      let y = parseInt(Math.floor(p.y * this.scale));
+      this.add(this.moveCommand(x, y, y));
+    }
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
@@ -139,6 +148,9 @@ io.on('connection', (socket) => {
     }
     if (msg.command == 'driveTillHit') {
       cq.driveTillHit();
+    }
+    if (msg.command == 'letter') {
+      cq.addPoints(msg.index);
     }
   });
 });
