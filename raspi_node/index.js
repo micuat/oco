@@ -34,10 +34,15 @@ const { exec } = require('child_process');
 
 const position = { x: 0, y: 0, z: 0 };
 
+// https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 wss.on('connection', (ws) => {
   wslistners.push(ws);
   console.log('client connected; number of clients: ' + wslistners.length)
-  ws.on('message', (message) => {
+  ws.on('message', async (message) => {
     if (message == 'dance') {
       exec('node /home/pi/oco/raspi_node/wsclient.js', (err, stdout, stderr) => {
         console.log(`stdout: ${stdout}`);
@@ -51,6 +56,11 @@ wss.on('connection', (ws) => {
       if (portOpened == false) {
         const commands = message.split(' ');
         if (commands[0] == 'moveToA') {
+          let dx = Math.abs(position.x - commands[1]);
+          let dy = Math.abs(position.y - commands[2]);
+          let dz = Math.abs(position.z - commands[3]);
+          let ms = Math.max(Math.max(dx, dy), dz);
+          await sleep(ms);
           position.x = commands[1];
           position.y = commands[2];
           position.z = commands[3];
