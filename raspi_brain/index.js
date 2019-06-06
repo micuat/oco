@@ -105,6 +105,7 @@ class CommandQueue {
   }
   messageReceived() {
     this.isWaitingForReply = false;
+    this.next();
   }
   isEmpty() {
     return this.queue.length == 0;
