@@ -101,7 +101,7 @@ class BumperManager {
         io.emit('bumper', { status: 'hit' });
         this.isOnWall = true;
         this.lastTime = t;
-        cq.driveTillHitFlag = false;
+        cq.hit = true;
       }
     }
     else if (level == '0' && this.isOnWall == true) {
@@ -120,12 +120,14 @@ class CommandQueue {
     this.isWaitingForReply = false;
     this.driveTillHitFlag = false;
     this.driveSteps = 1000;
+    this.turnSteps = 5000;
     this.handler = setInterval(() => {
       this.next();
     }, 10);
     this.scale = 1;
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
+    this.hit = false;
   }
   moveCommand(x, y, z) {
     return ['moveToA', x, y, z, '200'];
@@ -204,7 +206,15 @@ class CommandQueue {
       this.messageJustSent();
     }
     if (this.isEmpty() && this.driveTillHitFlag) {
-      this.addMove(0, this.driveSteps, this.driveSteps);
+      if (this.hit == false) {
+        this.addMove(0, this.driveSteps, this.driveSteps);
+      }
+      else {
+        this.driveTillHitFlag = false;
+        this.hit = false;
+        this.addMove(0, -this.driveSteps, -this.driveSteps);
+        this.addMove(0, this.turnSteps, -this.turnSteps);
+      }
     }
   }
 }
