@@ -117,7 +117,9 @@ void rotServo() {
   char *arg;
   arg = command.next();
   int pos = min(max(0, atoi(arg)), 360);
+  arg = command.next();
+  int delta = max(0, atoi(arg));
 
-  mysmartservo.moveTo(0,-pos,50);
+  mysmartservo.moveTo(0,-pos,delta);
   printPosition();
 }
