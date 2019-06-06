@@ -1,10 +1,10 @@
-const fs = require("fs");
+const fs = require('fs');
 const loadJson = (f) => {
   return JSON.parse(fs.readFileSync(f));
 }
 
-const settings = loadJson("settings.json");
-const points = loadJson("points.json");
+const settings = loadJson('settings.json');
+const points = loadJson('points.json');
 
 const WebSocket = require('ws');
 const ws = new WebSocket('ws://127.0.0.1:8080');
@@ -124,26 +124,38 @@ class CommandQueue {
       this.next();
     }, 10);
     this.scale = 1;
+    this.servoAngleOn = 80;
+    this.servoAngleOff = 0;
   }
   moveCommand(x, y, z) {
-    return ["moveToA", x, y, z, "200"];
+    return ['moveToA', x, y, z, '200'];
   }
   add(m) {
     this.queue.push(m);
   }
   addMove(x, y, z) {
-    // this.add(["clearY"]);
-    // this.add(["clearZ"]);
+    // this.add(['clearY']);
+    // this.add(['clearZ']);
     this.add(this.moveCommand(x, y, z));
-    this.add(["clearY"]);
-    this.add(["clearZ"]);
+    this.add(['clearY']);
+    this.add(['clearZ']);
   }
   addPoints(index) {
+    let servoState = false;
     for (const p of points[index]) {
+      if(servoState == false && p.stroke == true) {
+        this.add(['servo', this.servoAngleOn]);
+        servoState = true;
+      }
+      else if(servoState == true && p.stroke == false) {
+        this.add(['servo', this.servoAngleOff]);
+        servoState = false;
+      }
       let x = parseInt(Math.floor(p.x * this.scale));
       let y = parseInt(Math.floor(p.y * this.scale));
       this.add(this.moveCommand(x, y, y));
     }
+    this.add(['servo', this.servoAngleOff]);
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
@@ -171,17 +183,20 @@ class CommandQueue {
   next() {
     if (this.isMessageSendable()) {
       const command = this.pop();
-      if(command[0] == "clearX") {
+      if(command[0] == 'clearX') {
         world.clearX();
       }
-      if(command[0] == "clearY") {
+      if(command[0] == 'clearY') {
         world.clearY();
       }
-      if(command[0] == "clearZ") {
+      if(command[0] == 'clearZ') {
         world.clearZ();
       }
-      if(command[0] == "moveToA") {
+      if(command[0] == 'moveToA') {
         world.moveToA(command[1], command[2], command[3]);
+      }
+      if(command[0] == 'servo') {
+        io.emit('servo', { angle: command[1] });
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });

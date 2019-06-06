@@ -64,14 +64,14 @@
     });
     // socket.on('position', (msg) => {
     //   console.log(msg)
-    //   position.x = msg.x;
-    //   position.y = msg.y;
-    //   position.z = msg.z;
     // });
     socket.on('world', (msg) => {
       console.log(msg)
       positionTarget.x = msg.x;
       positionTarget.y = msg.y;
+    });
+    socket.on('servo', (msg) => {
+      console.log(msg)
     });
   </script>
 </body>
