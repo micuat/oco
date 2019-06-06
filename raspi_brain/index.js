@@ -59,6 +59,7 @@ class BumperManager {
         io.emit('bumper', { status: 'hit' });
         this.isOnWall = true;
         this.lastTime = t;
+        cq.driveTillHitFlag = false;
       }
     }
     else if (level == '0' && this.isOnWall == true) {
@@ -75,6 +76,8 @@ class CommandQueue {
   constructor() {
     this.queue = [];
     this.isWaitingForReply = false;
+    this.driveTillHitFlag = false;
+    this.driveSteps = 1000;
     this.handler = setInterval(() => {
       this.next();
     }, 10);
@@ -85,14 +88,16 @@ class CommandQueue {
   add(m) {
     this.queue.push(m);
   }
-  addMoveCommand(x, y, z) {
-  }
   addMove(x, y, z) {
     this.add("clearY");
     this.add("clearZ");
     this.add(this.moveCommand(x, y, z));
     this.add("clearY");
     this.add("clearZ");
+  }
+  driveTillHit() {
+    this.driveTillHitFlag = true;
+    this.addMove(0, this.driveSteps, this.driveSteps);
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -118,6 +123,9 @@ class CommandQueue {
       ws.send(this.pop());
       this.messageJustSent();
     }
+    if(this.isEmpty() && this.driveTillHitFlag) {
+      this.addMove(0, this.driveSteps, this.driveSteps);
+    }
   }
 }
 const cq = new CommandQueue();
@@ -130,8 +138,7 @@ io.on('connection', (socket) => {
       cq.addMove(0, msg.steps, msg.steps);
     }
     if (msg.command == 'driveTillHit') {
-      const steps = 1000;
-      cq.addMove(0, steps, steps);
+      cq.driveTillHit();
     }
   });
 });

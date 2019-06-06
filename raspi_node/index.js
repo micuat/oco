@@ -74,6 +74,7 @@ wss.on('connection', (ws) => {
         if (commands[0] == 'clearZ') {
           position.z = 0;
         }
+        await sleep(500);
         for (let ws of wslistners) {
           ws.send(`${position.x} ${position.y} ${position.z}`);
         }
