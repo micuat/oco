@@ -138,6 +138,8 @@ io.on('connection', (socket) => {
 ws.on('message', (data) => {
   console.log(data);
   cq.messageReceived();
+  const p = data.split(' ');
+  io.emit('position', { x: p[0], y: p[1], z: p[2] });
 });
 
 process.stdin.setRawMode = true;

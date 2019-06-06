@@ -35,7 +35,8 @@
       });
     }
 
-    let bumper = { status: '' };
+    const bumper = { status: '' };
+    const position = { x: 0, y: 0, z: 0 };
     function draw() {
       let bg;
       if (bumper.status == 'hit') {
@@ -47,10 +48,18 @@
       else
         bg = [0, 0, 0];
       background(bg[0], bg[1], bg[2]);
+      fill(255);
+      ellipse(position.x * 0.1, position.y * 0.1, 20, 20);
     }
     socket.on('bumper', (msg) => {
       console.log(msg)
-      bumper = msg;
+      bumper.status = msg.status;
+    });
+    socket.on('position', (msg) => {
+      console.log(msg)
+      position.x = msg.x;
+      position.y = msg.y;
+      position.z = msg.z;
     });
   </script>
 </body>
