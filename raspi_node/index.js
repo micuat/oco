@@ -60,7 +60,7 @@ wss.on('connection', (ws) => {
           let dy = Math.abs(position.y - commands[2]);
           let dz = Math.abs(position.z - commands[3]);
           let ms = Math.max(Math.max(dx, dy), dz);
-          await sleep(ms);
+          await sleep(ms * 0.1);
           position.x = commands[1];
           position.y = commands[2];
           position.z = commands[3];

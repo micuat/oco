@@ -58,21 +58,31 @@ class World {
   }
 
   clearX() {
-    this.origin.x += this.relative.x;
-    this.relative.x = 0;
   }
   clearY() {
-    this.origin.y += this.relative.y;
+    this.origin.x += this.getRotatedRelative().x;
+    this.origin.y += this.getRotatedRelative().y;
+    this.relative.x = 0;
     this.relative.y = 0;
   }
   clearZ() {
   }
-  moveToA(x, y, z) {
+  moveToA(x, y) {
     this.relative.x = x;
     this.relative.y = y;
   }
+  rotate(t) {
+    this.angle += t;
+  }
+  getRotatedRelative() {
+    const p = new Point();
+    let t = this.angle * Math.PI / 180;
+    p.x = Math.cos(t) * this.relative.x - Math.sin(t) * this.relative.y;
+    p.y = Math.sin(t) * this.relative.x + Math.cos(t) * this.relative.y;
+    return p;
+  }
   getPosition() {
-    return this.relative.add(this.origin);
+    return this.origin.add(this.getRotatedRelative());
   }
 }
 
@@ -120,25 +130,26 @@ class CommandQueue {
     this.isWaitingForReply = false;
     this.driveTillHitFlag = false;
     this.driveSteps = 1000;
-    this.turnSteps = 5000;
     this.handler = setInterval(() => {
       this.next();
     }, 10);
     this.scale = 1;
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
+    this.servoDelta = 500;
     this.hit = false;
-  }
-  moveCommand(x, y, z) {
-    return ['moveToA', x, y, z, '200'];
+    this.driveDelay = 200;
   }
   add(m) {
     this.queue.push(m);
   }
-  addMove(x, y, z) {
-    // this.add(['clearY']);
-    // this.add(['clearZ']);
-    this.add(this.moveCommand(x, y, z));
+  addMove(x, y) {
+    this.add(['moveToA', x, y]);
+    this.add(['clearY']);
+    this.add(['clearZ']);
+  }
+  addRotate(t) {
+    this.add(['rotate', t]);
     this.add(['clearY']);
     this.add(['clearZ']);
   }
@@ -146,22 +157,22 @@ class CommandQueue {
     let servoState = false;
     for (const p of points[index]) {
       if(servoState == false && p.stroke == true) {
-        this.add(['servo', this.servoAngleOn]);
+        this.add(['servo', this.servoAngleOn, this.servoDelta]);
         servoState = true;
       }
       else if(servoState == true && p.stroke == false) {
-        this.add(['servo', this.servoAngleOff]);
+        this.add(['servo', this.servoAngleOff, this.servoDelta]);
         servoState = false;
       }
       let x = parseInt(Math.floor(p.x * this.scale));
       let y = parseInt(Math.floor(p.y * this.scale));
-      this.add(this.moveCommand(x, y, y));
+      this.add(['moveToA', x, y]);
     }
-    this.add(['servo', this.servoAngleOff]);
+    this.add(['servo', this.servoAngleOff, this.servoDelta]);
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
-    this.addMove(0, this.driveSteps, this.driveSteps);
+    this.addMove(0, this.driveSteps);
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -187,22 +198,30 @@ class CommandQueue {
       const command = this.pop();
       if(command[0] == 'clearX') {
         world.clearX();
+        ws.send('clearX');
       }
       if(command[0] == 'clearY') {
         world.clearY();
+        ws.send('clearY');
       }
       if(command[0] == 'clearZ') {
         world.clearZ();
+        ws.send('clearZ');
       }
       if(command[0] == 'moveToA') {
-        world.moveToA(command[1], command[2], command[3]);
+        world.moveToA(command[1], command[2]);
+        ws.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
+      }
+      if(command[0] == 'rotate') {
+        world.rotate(command[1]);
+        ws.send(`moveToA 0 ${command[1] * 300} -${command[1] * 300} ${this.driveDelay}`);
       }
       if(command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
+        ws.send(`servo ${command[1]} ${command[2]}`);
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });
-      ws.send(command.join(' '));
       this.messageJustSent();
     }
     if (this.isEmpty() && this.driveTillHitFlag) {
@@ -212,8 +231,8 @@ class CommandQueue {
       else {
         this.driveTillHitFlag = false;
         this.hit = false;
-        this.addMove(0, -this.driveSteps, -this.driveSteps);
-        this.addMove(0, this.turnSteps, -this.turnSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addRotate(180);
       }
     }
   }
@@ -225,7 +244,7 @@ io.on('connection', (socket) => {
   socket.on('client', (msg) => {
     console.log('message: ' + msg);
     if (msg.command == 'drive') {
-      cq.addMove(0, msg.steps, msg.steps);
+      cq.addMove(0, msg.steps);
     }
     if (msg.command == 'driveTillHit') {
       cq.driveTillHit();
