@@ -173,9 +173,11 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
 {
 
     //stepOff van motoren
-	motorX.stepOff();
-	motorY.stepOff();
-	motorZ.stepOff();
+	  motorX.stepOff();
+	  motorY.stepOff();
+	  motorZ.stepOff();
+    motorE.stepOff();
+    motorQ.stepOff();
 
     long deltaX = targetX - motorX.position;
     long deltaY = targetY - motorY.position;
@@ -198,21 +200,25 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
     if (deltaY < 0)
     {
         motorY.setDir(-1);
+        motorE.setDir(-1);
         deltaY *= -1;
     }
     else
     {
         motorY.setDir(1);
+        motorE.setDir(1);
     }
 
     if (deltaZ < 0)
     {
         motorZ.setDir(-1);
+        motorQ.setDir(-1);
         deltaZ *= -1;
     }
     else
     {
         motorZ.setDir(1);
+        motorQ.setDir(1);
     }
 
     //als deltaX de grootste is gebruiken vergelijken we steeds met de X as
@@ -229,6 +235,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             {
                 //motor Y stapt
                 motorY.stepOn();
+                motorE.stepOn();
                 dispY++;
             }
 
@@ -236,6 +243,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             {
                 //motor Z stapt
                 motorZ.stepOn();
+                motorQ.stepOn();
                 dispZ++;
             }
 
@@ -245,6 +253,8 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             motorX.stepOff();
             motorY.stepOff();
             motorZ.stepOff();
+            motorE.stepOff();
+            motorQ.stepOff();
         }
     }
     else if(deltaZ >= deltaX && deltaZ >= deltaY)
@@ -253,6 +263,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
         {
             //MotorZ zal altijd stappen
             motorZ.stepOn();
+            motorQ.stepOn();
             dispZ++;
 
             if(dispZ * deltaX / deltaZ > motorX.position)
@@ -266,6 +277,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             {
                 //motor Y stapt
                 motorY.stepOn();
+                motorE.stepOn();
                 dispY++;
             }
 
@@ -275,6 +287,8 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             motorX.stepOff();
             motorY.stepOff();
             motorZ.stepOff();
+            motorE.stepOff();
+            motorQ.stepOff();
         }
     }
     else if(deltaY >= deltaX && deltaY >= deltaZ)
@@ -283,6 +297,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
         {
             //MotorX zal altijd stappen
             motorY.stepOn();
+            motorE.stepOn();
             dispY++;
 
             if(dispY * deltaX / deltaY > dispX)
@@ -296,6 +311,7 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             {
                 //motor Z stapt
                 motorZ.stepOn();
+                motorQ.stepOn();
                 dispZ++;
             }
 
@@ -305,145 +321,8 @@ void Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
             motorX.stepOff();
             motorY.stepOff();
             motorZ.stepOff();
-        }
-    }
-}
-
-void Ramps::moveToRelative(long targetX, long targetY, long targetZ, int _delay = 500)
-{
-
-    //stepOff van motoren
-	motorX.stepOff();
-	motorY.stepOff();
-	motorZ.stepOff();
-
-    long deltaX = targetX;
-    long deltaY = targetY;
-    long deltaZ = targetZ;
-
-    long dispX = 0;
-    long dispY = 0;
-    long dispZ = 0;
-
-    if (deltaX < 0)
-    {
-        motorX.setDir(-1);
-        deltaX *= -1;
-    }
-    else
-    {
-        motorX.setDir(1);
-    }
-
-    if (deltaY < 0)
-    {
-        motorY.setDir(-1);
-        deltaY *= -1;
-    }
-    else
-    {
-        motorY.setDir(1);
-    }
-
-    if (deltaZ < 0)
-    {
-        motorZ.setDir(-1);
-        deltaZ *= -1;
-    }
-    else
-    {
-        motorZ.setDir(1);
-    }
-
-    //als deltaX de grootste is gebruiken vergelijken we steeds met de X as
-    //dat doen we ook voor de andere assen als zij groter zijn
-    if(deltaX >= deltaY && deltaX >= deltaZ)
-    {
-        while(dispX != deltaX)
-        {
-            //MotorX zal altijd stappen
-            motorX.stepOn();
-            dispX++;
-
-            if(dispX * deltaY / deltaX > dispY)
-            {
-                //motor Y stapt
-                motorY.stepOn();
-                dispY++;
-            }
-
-            if(dispX * deltaZ / deltaX > dispZ)
-            {
-                //motor Z stapt
-                motorZ.stepOn();
-                dispZ++;
-            }
-
-            delayMicroseconds(_delay); //Wacht het aantal microseconden
-
-            //stepOff van de motoren
-            motorX.stepOff();
-            motorY.stepOff();
-            motorZ.stepOff();
-        }
-    }
-    else if(deltaZ >= deltaX && deltaZ >= deltaY)
-    {
-        while(motorZ.position != deltaZ)
-        {
-            //MotorZ zal altijd stappen
-            motorZ.stepOn();
-
-            if(motorZ.position * deltaX / deltaZ > motorX.position)
-            {
-                //motor X stapt
-                motorX.stepOn();
-                dispX++;
-            }
-
-            if(motorZ.position * deltaY / deltaZ > dispY)
-            {
-                //motor Y stapt
-                motorY.stepOn();
-                dispY++;
-            }
-
-            delayMicroseconds(_delay); //Wacht het aantal microseconden
-
-            //stepOff van de motoren
-            motorX.stepOff();
-            motorY.stepOff();
-            motorZ.stepOff();
-        }
-    }
-    else if(deltaY >= deltaX && deltaY >= deltaZ)
-    {
-        while(dispY != deltaY)
-        {
-            //MotorX zal altijd stappen
-            motorY.stepOn();
-            dispY++;
-
-            if(dispY * deltaX / deltaY > dispX)
-            {
-                //motor X stapt
-                motorX.stepOn();
-                dispX++;
-            }
-
-            if(dispY * deltaZ / deltaY > dispZ)
-            {
-                //motor Z stapt
-                motorZ.stepOn();
-                dispZ++;
-            }
-
-            delayMicroseconds(_delay); //Wacht het aantal microseconden
-
-            //stepOff van de motoren
-            motorX.stepOff();
-            motorY.stepOff();
-            motorZ.stepOff();
+            motorE.stepOff();
+            motorQ.stepOff();
         }
     }
 }

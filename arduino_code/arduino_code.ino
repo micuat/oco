@@ -9,6 +9,8 @@ MeSmartServo mysmartservo(PORT5); // somehow goes to tx2/rx2 of mega
 
 SerialCommand command;
 
+int servoPos = 0;
+
 Ramps ramps = Ramps();
 
 void printPosition() {
@@ -17,6 +19,8 @@ void printPosition() {
   Serial.print(ramps.motorY.position);
   Serial.print(" ");
   Serial.print(ramps.motorZ.position);
+  Serial.print(" ");
+  Serial.print(servoPos);
   Serial.println("");
 }
 
@@ -41,7 +45,6 @@ void setup()
   
   command.addCommand("home", homeX);
   command.addCommand("moveToA", moveTo);
-  command.addCommand("moveToR", moveToRelative);
   command.addCommand("servo", rotServo);
   command.addCommand("clearX", clearX);
   command.addCommand("clearY", clearY);
@@ -97,29 +100,13 @@ void moveTo() {
   printPosition();
 }
 
-void moveToRelative() {
-  char *arg;
-  arg = command.next();
-  int xPos = atoi(arg);
-  arg = command.next();
-  int yPos = atoi(arg);
-  arg = command.next();
-  int zPos = atoi(arg);
-  arg = command.next();
-  int sp = atoi(arg);
-
-  ramps.moveToRelative(xPos, yPos, zPos, sp);
-  printPosition();
-}
-
-
 void rotServo() {
   char *arg;
   arg = command.next();
-  int pos = min(max(0, atoi(arg)), 360);
+  servoPos = min(max(0, atoi(arg)), 360);
   arg = command.next();
   int delta = max(0, atoi(arg));
 
-  mysmartservo.moveTo(0,-pos,delta);
+  mysmartservo.moveTo(0,-servoPos,delta);
   printPosition();
 }
