@@ -22,20 +22,28 @@
   <script>
     const socket = io();
 
-    let driveButton, driveTillHitButton, letterButton;
+    const buttons = {};
     function setup() {
-      createCanvas(800, 400);
-      driveButton = createButton('drive');
-      driveButton.mousePressed(() => {
-        socket.emit('client', { command: 'drive', steps: 1000 })
+      createCanvas(600, 600);
+      buttons.drive = createButton('drive');
+      buttons.drive.mousePressed(() => {
+        socket.emit('client', { command: 'drive', steps: 800 })
       });
-      driveTillHitButton = createButton('drive till hit');
-      driveTillHitButton.mousePressed(() => {
+      buttons.driveTillHit = createButton('drive till hit');
+      buttons.driveTillHit.mousePressed(() => {
         socket.emit('client', { command: 'driveTillHit' })
       });
-      letterButton = createButton('letter');
-      letterButton.mousePressed(() => {
+      buttons.letter = createButton('letter');
+      buttons.letter.mousePressed(() => {
         socket.emit('client', { command: 'letter', index: parseInt(Math.random() * 4) })
+      });
+      buttons.left = createButton('left');
+      buttons.left.mousePressed(() => {
+        socket.emit('client', { command: 'rotate', angle: 45 })
+      });
+      buttons.right = createButton('right');
+      buttons.right.mousePressed(() => {
+        socket.emit('client', { command: 'rotate', angle: -45 })
       });
     }
 
@@ -59,13 +67,13 @@
       stroke(255);
       beginShape(POINTS);
       for (const p of points) {
-        vertex(p.y, p.x);
+        vertex(p.x, p.y);
       }
       endShape();
       fill(255);
       position.x = lerp(position.x, positionTarget.x, 0.5);
       position.y = lerp(position.y, positionTarget.y, 0.5);
-      ellipse(position.y, position.x, 20, 20);
+      ellipse(position.x, position.y, 20, 20);
     }
     socket.on('bumper', (msg) => {
       console.log(msg)

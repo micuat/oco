@@ -156,11 +156,11 @@ class CommandQueue {
   addPoints(index) {
     let servoState = false;
     for (const p of points[index]) {
-      if(servoState == false && p.stroke == true) {
+      if (servoState == false && p.stroke == true) {
         this.add(['servo', this.servoAngleOn, this.servoDelta]);
         servoState = true;
       }
-      else if(servoState == true && p.stroke == false) {
+      else if (servoState == true && p.stroke == false) {
         this.add(['servo', this.servoAngleOff, this.servoDelta]);
         servoState = false;
       }
@@ -196,27 +196,27 @@ class CommandQueue {
   next() {
     if (this.isMessageSendable()) {
       const command = this.pop();
-      if(command[0] == 'clearX') {
+      if (command[0] == 'clearX') {
         world.clearX();
         ws.send('clearX');
       }
-      if(command[0] == 'clearY') {
+      if (command[0] == 'clearY') {
         world.clearY();
         ws.send('clearY');
       }
-      if(command[0] == 'clearZ') {
+      if (command[0] == 'clearZ') {
         world.clearZ();
         ws.send('clearZ');
       }
-      if(command[0] == 'moveToA') {
+      if (command[0] == 'moveToA') {
         world.moveToA(command[1], command[2]);
         ws.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
       }
-      if(command[0] == 'rotate') {
+      if (command[0] == 'rotate') {
         world.rotate(command[1]);
         ws.send(`moveToA 0 ${command[1] * 300} -${command[1] * 300} ${this.driveDelay}`);
       }
-      if(command[0] == 'servo') {
+      if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
         ws.send(`servo ${command[1]} ${command[2]}`);
       }
@@ -242,15 +242,21 @@ const cq = new CommandQueue();
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('client', (msg) => {
-    console.log('message: ' + msg);
-    if (msg.command == 'drive') {
-      cq.addMove(0, msg.steps);
-    }
-    if (msg.command == 'driveTillHit') {
-      cq.driveTillHit();
-    }
-    if (msg.command == 'letter') {
-      cq.addPoints(msg.index);
+    console.log('message: ' + msg.command);
+    switch (msg.command) {
+      case 'drive':
+        cq.addMove(0, msg.steps);
+        break;
+      case 'driveTillHit':
+        cq.driveTillHit();
+        break;
+      case 'letter':
+        cq.addPoints(msg.index);
+        break;
+      case 'rotate':
+      console.log("hey")
+        cq.addRotate(msg.angle);
+        break;
     }
   });
 });
