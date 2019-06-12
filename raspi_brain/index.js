@@ -137,6 +137,7 @@ class CommandQueue {
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
     this.servoDelta = 500;
+    this.servoDelay = 500;
     this.hit = false;
     this.driveDelay = 200;
   }
@@ -230,7 +231,7 @@ class CommandQueue {
       }
       if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
-        this.send(`servo ${command[1]} ${command[2]} 1000`);
+        this.send(`servo ${command[1]} ${command[2]} ${this.servoDelay}`);
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });
