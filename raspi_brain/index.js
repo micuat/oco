@@ -136,8 +136,8 @@ class CommandQueue {
     this.scale = 25;
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
-    this.servoDelta = 500;
-    this.servoDelay = 500;
+    this.servoDelta = 2;
+    this.servoDelay = 1000;
     this.hit = false;
     this.driveDelay = 200;
   }
@@ -161,19 +161,30 @@ class CommandQueue {
     let servoState = false;
     for (const p of points[index]) {
       if (servoState == false && p.stroke == true) {
-        this.add(['servo', this.servoAngleOn, this.servoDelta]);
+        for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
+          this.add(['servo', i, this.servoDelta, 0]);
+        }
+        this.add(['servo', this.servoAngleOn, this.servoDelta, this.servoDelay]);
         servoState = true;
       }
       else if (servoState == true && p.stroke == false) {
-        this.add(['servo', this.servoAngleOff, this.servoDelta]);
+        for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
+          this.add(['servo', i, this.servoDelta, 0]);
+        }
+        this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
         servoState = false;
       }
       let x = parseInt(Math.floor(p.x * this.scale));
       let y = parseInt(Math.floor(p.y * this.scale));
       this.add(['moveToA', x, y]);
     }
-    this.add(['servo', this.servoAngleOff, this.servoDelta]);
-    servoState = false;
+    if(servoState == true) {
+      for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
+        this.add(['servo', i, this.servoDelta, 0]);
+      }
+      this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
+      servoState = false;
+    }
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
@@ -227,11 +238,11 @@ class CommandQueue {
       }
       if (command[0] == 'rotate') {
         world.rotate(command[1]);
-        this.send(`moveToA 0 ${command[1] * 300} -${command[1] * 300} ${this.driveDelay}`);
+        this.send(`moveToA 0 ${command[1] * 1800} -${command[1] * 1800} ${this.driveDelay}`);
       }
       if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
-        this.send(`servo ${command[1]} ${command[2]} ${this.servoDelay}`);
+        this.send(`servo ${command[1]} ${command[2]} ${command[3]}`);
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });
