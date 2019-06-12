@@ -14,13 +14,13 @@ int servoPos = 0;
 Ramps ramps = Ramps();
 
 void printPosition() {
-  Serial.print(ramps.motorX.position);
+  Serial.print(ramps.motorX.position, DEC);
   Serial.print(" ");
-  Serial.print(ramps.motorY.position);
+  Serial.print(ramps.motorY.position, DEC);
   Serial.print(" ");
-  Serial.print(ramps.motorZ.position);
+  Serial.print(ramps.motorZ.position, DEC);
   Serial.print(" ");
-  Serial.print(servoPos);
+  Serial.print(servoPos, DEC);
   Serial.println("");
 }
 
