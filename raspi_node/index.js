@@ -8,10 +8,10 @@ function loadSettings() {
 
 const settings = loadSettings();
 
-let portOpened = true;
+let portOpened = false;
 const port = new SerialPort(settings.serialPort, { baudRate: settings.baudRate }, (err) => {
   console.log(err)
-  portOpened = false;
+  portOpened = true;
 })
 
 const express = require('express');
