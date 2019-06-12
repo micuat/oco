@@ -25,6 +25,10 @@
     const buttons = {};
     function setup() {
       createCanvas(600, 600);
+      buttons.home = createButton('home');
+      buttons.home.mousePressed(() => {
+        socket.emit('client', { command: 'home' })
+      });
       buttons.drive = createButton('drive');
       buttons.drive.mousePressed(() => {
         socket.emit('client', { command: 'drive', steps: 800 })

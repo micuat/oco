@@ -7,7 +7,7 @@ const settings = loadJson('settings.json');
 const points = loadJson('points.json');
 
 const WebSocket = require('ws');
-const ws = new WebSocket('ws://127.0.0.1:8080');
+const ws = new WebSocket(settings.wsUrl);
 
 const express = require('express');
 const app = express();
@@ -133,7 +133,7 @@ class CommandQueue {
     this.handler = setInterval(() => {
       this.next();
     }, 10);
-    this.scale = 1;
+    this.scale = 25;
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
     this.servoDelta = 500;
@@ -153,6 +153,9 @@ class CommandQueue {
     this.add(['clearY']);
     this.add(['clearZ']);
   }
+  home() {
+    this.add(['home']);
+  }
   addPoints(index) {
     let servoState = false;
     for (const p of points[index]) {
@@ -169,6 +172,7 @@ class CommandQueue {
       this.add(['moveToA', x, y]);
     }
     this.add(['servo', this.servoAngleOff, this.servoDelta]);
+    servoState = false;
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
@@ -193,32 +197,40 @@ class CommandQueue {
   pop() {
     return this.queue.shift();
   }
+  send(s) {
+    ws.send(s);
+    console.log('=> ' + s);
+  }
   next() {
     if (this.isMessageSendable()) {
       const command = this.pop();
+      if (command[0] == 'home') {
+        world.clearX();
+        this.send('home');
+      }
       if (command[0] == 'clearX') {
         world.clearX();
-        ws.send('clearX');
+        this.send('clearX');
       }
       if (command[0] == 'clearY') {
         world.clearY();
-        ws.send('clearY');
+        this.send('clearY');
       }
       if (command[0] == 'clearZ') {
         world.clearZ();
-        ws.send('clearZ');
+        this.send('clearZ');
       }
       if (command[0] == 'moveToA') {
         world.moveToA(command[1], command[2]);
-        ws.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
+        this.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
       }
       if (command[0] == 'rotate') {
         world.rotate(command[1]);
-        ws.send(`moveToA 0 ${command[1] * 300} -${command[1] * 300} ${this.driveDelay}`);
+        this.send(`moveToA 0 ${command[1] * 300} -${command[1] * 300} ${this.driveDelay}`);
       }
       if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
-        ws.send(`servo ${command[1]} ${command[2]}`);
+        this.send(`servo ${command[1]} ${command[2]}`);
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });
@@ -244,6 +256,9 @@ io.on('connection', (socket) => {
   socket.on('client', (msg) => {
     console.log('message: ' + msg.command);
     switch (msg.command) {
+      case 'home':
+        cq.home();
+        break;
       case 'drive':
         cq.addMove(0, msg.steps);
         break;
@@ -262,7 +277,7 @@ io.on('connection', (socket) => {
 });
 
 ws.on('message', (data) => {
-  console.log(data);
+  console.log('\t\t\t\t<= ', data);
   cq.messageReceived();
   const p = data.split(' ');
   io.emit('position', { x: p[0], y: p[1], z: p[2] });
