@@ -230,7 +230,7 @@ class CommandQueue {
       }
       if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
-        this.send(`servo ${command[1]} ${command[2]}`);
+        this.send(`servo ${command[1]} ${command[2]} 1000`);
       }
       const p = world.getPosition();
       io.emit('world', { x: p.x, y: p.y });

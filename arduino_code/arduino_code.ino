@@ -106,7 +106,10 @@ void rotServo() {
   servoPos = min(max(0, atoi(arg)), 360);
   arg = command.next();
   int delta = max(0, atoi(arg));
+  arg = command.next();
+  int sleepMs = max(0, atoi(arg));
 
   mysmartservo.moveTo(0,-servoPos,delta);
+  delay(sleepMs);
   printPosition();
 }
