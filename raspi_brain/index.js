@@ -145,11 +145,15 @@ class CommandQueue {
     this.queue.push(m);
   }
   addMove(x, y) {
+    this.add(['clearY']);
+    this.add(['clearZ']);
     this.add(['moveToA', x, y]);
     this.add(['clearY']);
     this.add(['clearZ']);
   }
   addRotate(t) {
+    this.add(['clearY']);
+    this.add(['clearZ']);
     this.add(['rotate', t]);
     this.add(['clearY']);
     this.add(['clearZ']);
@@ -250,13 +254,23 @@ class CommandQueue {
     }
     if (this.isEmpty() && this.driveTillHitFlag) {
       if (this.hit == false) {
-        this.addMove(0, this.driveSteps, this.driveSteps);
+        this.addMove(0, this.driveSteps);
       }
       else {
         this.driveTillHitFlag = false;
         this.hit = false;
         this.addMove(0, -this.driveSteps);
-        this.addRotate(180);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addMove(0, -this.driveSteps);
+        this.addRotate(30);
+        this.addRotate(30);
+        this.addRotate(30);
       }
     }
   }
