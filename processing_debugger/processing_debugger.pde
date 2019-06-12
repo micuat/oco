@@ -78,7 +78,7 @@ void draw() {
   ellipse(realX / mult, realY / mult, 20, 20);
   if (commandQueue.isMessageQueueable()) {
     if (mouseX != prevMouseX && mouseY != prevMouseY) {
-      commandQueue.add(moveCommand(16000-mouseX * mult, mouseY * mult, mouseY * mult));
+      commandQueue.add(moveCommand(mouseX * mult, mouseY * mult, mouseY * mult));
 
       if (mousePressed) {
         trace[head++] = mouseX;
@@ -143,6 +143,6 @@ void webSocketEvent(String msg) {
   commandQueue.messageReceived();
 
   println(msg);
-  realX = 16000-parseInt(msg.split(" ")[0]);
+  realX = parseInt(msg.split(" ")[0]);
   realY = parseInt(msg.split(" ")[1]);
 }
