@@ -57,7 +57,7 @@
 class Ramps
 {
 	public: //Public functies en variabelen
-
+    int pin_bumper0;
 		//Constructor
 		Ramps();
 
@@ -78,6 +78,8 @@ class Ramps
 		void moveTo(long targetX, long targetY, long targetZ, int _delay);
 
 		void moveDelta(long deltaX, long deltaY, long deltaZ, int _delay);
+
+    void driveTillHit(int _delay);
 
 		//declareren van motors
 		PololuStepper motorX = PololuStepper(	X_STEP_PIN, X_DIR_PIN,

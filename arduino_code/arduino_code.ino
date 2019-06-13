@@ -27,8 +27,13 @@ void printPosition() {
 int pin_12v0 = 10;
 int pin_12v1 = 9;
 
+int pin_bumper0 = 23;
+
 void setup()
 {
+  pinMode(pin_bumper0, INPUT_PULLUP);
+  ramps.pin_bumper0 = pin_bumper0;
+
   pinMode(pin_12v0, OUTPUT);
   pinMode(pin_12v1, OUTPUT);
   digitalWrite(pin_12v0, HIGH);
@@ -119,5 +124,13 @@ void drive() {
   int sp = atoi(arg);
 
   ramps.moveDelta(0, yPos, zPos, sp);
+  printPosition();
+}
+
+void driveTillHit() {
+  char *arg;
+  arg = command.next();
+  int sp = atoi(arg);
+  ramps.driveTillHit(sp);
   printPosition();
 }
