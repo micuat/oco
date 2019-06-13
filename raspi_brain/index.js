@@ -160,14 +160,7 @@ class CommandQueue {
     this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
     let servoState = false;
     for (const p of points[index]) {
-      if (servoState == false && p.stroke == true) {
-        for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
-          this.add(['servo', i, this.servoDelta, 0]);
-        }
-        this.add(['servo', this.servoAngleOn, this.servoDelta, this.servoDelay]);
-        servoState = true;
-      }
-      else if (servoState == true && p.stroke == false) {
+      if (servoState == true && p.stroke == false) {
         for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
           this.add(['servo', i, this.servoDelta, 0]);
         }
@@ -177,6 +170,13 @@ class CommandQueue {
       let x = parseInt(Math.floor(p.x * this.scale));
       let y = parseInt(Math.floor(p.y * this.scale * 0.667));
       this.add(['moveToA', x, y]);
+      if (servoState == false && p.stroke == true) {
+        for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
+          this.add(['servo', i, this.servoDelta, 0]);
+        }
+        this.add(['servo', this.servoAngleOn, this.servoDelta, this.servoDelay]);
+        servoState = true;
+      }
     }
     if(servoState == true) {
       for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
@@ -260,17 +260,17 @@ class CommandQueue {
       this.driveTillHitFlag = false;
       this.hit = false;
       this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
-      // this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
+      this.addMove(0, -this.driveSteps);
       this.addRotate(30);
-      // this.addRotate(30);
-      // this.addRotate(30);
+      this.addRotate(30);
+      this.addRotate(30);
     }
   }
 }
