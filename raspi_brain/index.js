@@ -145,18 +145,10 @@ class CommandQueue {
     this.queue.push(m);
   }
   addMove(x, y) {
-    this.add(['clearY']);
-    this.add(['clearZ']);
-    this.add(['moveToA', x, y]);
-    this.add(['clearY']);
-    this.add(['clearZ']);
+    this.add(['drive', x, y]);
   }
   addRotate(t) {
-    this.add(['clearY']);
-    this.add(['clearZ']);
     this.add(['rotate', t]);
-    this.add(['clearY']);
-    this.add(['clearZ']);
   }
   home() {
     this.add(['home']);
@@ -244,9 +236,13 @@ class CommandQueue {
         world.moveToA(command[1], command[2]);
         this.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
       }
+      if (command[0] == 'drive') {
+        world.moveToA(command[1], command[2]);
+        this.send(`drive ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
+      }
       if (command[0] == 'rotate') {
         world.rotate(command[1]);
-        this.send(`moveToA 0 ${command[1] * 1800} -${command[1] * 1800} ${this.driveDelay}`);
+        this.send(`drive 0 ${command[1] * 1800} -${command[1] * 1800} ${this.driveDelay}`);
       }
       if (command[0] == 'servo') {
         io.emit('servo', { angle: command[1] });
