@@ -188,7 +188,7 @@ class CommandQueue {
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
-    this.addMove(0, this.driveSteps);
+    this.add(['driveTillHit']);
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -240,6 +240,10 @@ class CommandQueue {
         world.moveToA(command[1], command[2]);
         this.send(`drive ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
       }
+      if (command[0] == 'driveTillHit') {
+        world.moveToA(command[1], command[2]);
+        this.send(`driveTillHit ${this.driveDelay}`);
+      }
       if (command[0] == 'rotate') {
         world.rotate(command[1]);
         this.send(`drive 0 ${command[1] * 1800} -${command[1] * 1800} ${this.driveDelay}`);
@@ -253,25 +257,20 @@ class CommandQueue {
       this.messageJustSent();
     }
     if (this.isEmpty() && this.driveTillHitFlag) {
-      if (this.hit == false) {
-        this.addMove(0, this.driveSteps);
-      }
-      else {
-        this.driveTillHitFlag = false;
-        this.hit = false;
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addMove(0, -this.driveSteps);
-        this.addRotate(30);
-        this.addRotate(30);
-        this.addRotate(30);
-      }
+      this.driveTillHitFlag = false;
+      this.hit = false;
+      this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      // this.addMove(0, -this.driveSteps);
+      this.addRotate(30);
+      // this.addRotate(30);
+      // this.addRotate(30);
     }
   }
 }

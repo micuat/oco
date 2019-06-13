@@ -55,6 +55,7 @@ void setup()
   command.addCommand("clearY", clearY);
   command.addCommand("clearZ", clearZ);
   command.addCommand("drive", drive);
+  command.addCommand("driveTillHit", driveTillHit);
   delay(500);
 }
 
