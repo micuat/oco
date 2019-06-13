@@ -36,11 +36,11 @@ void PololuStepper::setDir(short _dir)
 }
 
 //Step Handmatig (Step off moet volgen na een bepaalde vertraging)
-bool PololuStepper::stepOn()
+bool PololuStepper::stepOn(bool skipStep = false)
 {
 	if (!stepped)
 	{
-		position += dir;
+		if(skipStep == false) position += dir;
 		digitalWrite(stepPin, HIGH);
 		stepped = true;
 

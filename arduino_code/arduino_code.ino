@@ -49,6 +49,7 @@ void setup()
   command.addCommand("clearX", clearX);
   command.addCommand("clearY", clearY);
   command.addCommand("clearZ", clearZ);
+  command.addCommand("drive", drive);
   delay(500);
 }
 
@@ -88,14 +89,6 @@ void moveTo() {
   arg = command.next();
   int sp = atoi(arg);
 
-//  Serial.print("debug: ");
-//  Serial.print(xPos);
-//  Serial.print(" ");
-//  Serial.print(yPos);
-//  Serial.print(" ");
-//  Serial.print(zPos);
-//  Serial.println();
-
   ramps.moveTo(xPos, yPos, zPos, sp);
   printPosition();
 }
@@ -111,5 +104,20 @@ void rotServo() {
 
   mysmartservo.moveTo(0,-servoPos,delta);
   delay(sleepMs);
+  printPosition();
+}
+
+void drive() {
+  char *arg;
+  arg = command.next();
+  int xPos = atoi(arg);
+  arg = command.next();
+  int yPos = atoi(arg);
+  arg = command.next();
+  int zPos = atoi(arg);
+  arg = command.next();
+  int sp = atoi(arg);
+
+  ramps.moveDelta(0, yPos, zPos, sp);
   printPosition();
 }
