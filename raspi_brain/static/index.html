@@ -88,8 +88,8 @@
     // });
     socket.on('world', (msg) => {
       console.log(msg)
-      positionTarget.x = msg.x * 0.1;
-      positionTarget.y = msg.y * 0.1;
+      positionTarget.x = msg.x * 0.1 / 40;
+      positionTarget.y = msg.y * 0.1 / 40;
       if (servo.angle > 70) {
         points.push({ x: msg.x * 0.1, y: msg.y * 0.1 });
         if (points.length > 1000) {

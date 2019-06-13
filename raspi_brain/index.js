@@ -133,13 +133,13 @@ class CommandQueue {
     this.handler = setInterval(() => {
       this.next();
     }, 10);
-    this.scale = 25;
+    this.scale = 40;
     this.servoAngleOn = 80;
     this.servoAngleOff = 0;
     this.servoDelta = 2;
     this.servoDelay = 1000;
     this.hit = false;
-    this.driveDelay = 200;
+    this.driveDelay = 1000;
   }
   add(m) {
     this.queue.push(m);
@@ -162,6 +162,10 @@ class CommandQueue {
     this.add(['home']);
   }
   addPoints(index) {
+    for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
+      this.add(['servo', i, this.servoDelta, 0]);
+    }
+    this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
     let servoState = false;
     for (const p of points[index]) {
       if (servoState == false && p.stroke == true) {
@@ -179,7 +183,7 @@ class CommandQueue {
         servoState = false;
       }
       let x = parseInt(Math.floor(p.x * this.scale));
-      let y = parseInt(Math.floor(p.y * this.scale));
+      let y = parseInt(Math.floor(p.y * this.scale * 0.667));
       this.add(['moveToA', x, y]);
     }
     if(servoState == true) {
