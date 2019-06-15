@@ -19,12 +19,8 @@ http.listen(settings.httpPort, () => {
   console.log('listening on *:' + settings.httpPort);
 });
 
-try {
-  var Gpio = require('pigpio').Gpio;
-} catch (er) {
-  Gpio = null;
-  console.log('skipping GPIO');
-}
+Gpio = null;
+console.log('skipping GPIO');
 
 if (Gpio) {
   const button = new Gpio(6, {
