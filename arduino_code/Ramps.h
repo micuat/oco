@@ -57,6 +57,10 @@
 class Ramps
 {
 	public: //Public functies en variabelen
+    const int DONE_NORMALLY = 0;
+    const int X_STOPPED = 1;
+    const int BUMPER_STOPPED = 2;
+    const int switch_threshold = 5;
     int pin_bumper0;
 		//Constructor
 		Ramps();
@@ -75,9 +79,9 @@ class Ramps
 		void fan(bool On);
 
 		//Beweeg naar gegeven positie met bresenhams lijn algoritme
-		void moveTo(long targetX, long targetY, long targetZ, int _delay);
+		int moveTo(long targetX, long targetY, long targetZ, int _delay);
 
-		void moveDelta(long deltaX, long deltaY, long deltaZ, int _delay);
+		int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay);
 
     void driveTillHit(int _delay);
 

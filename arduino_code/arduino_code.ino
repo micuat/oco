@@ -13,7 +13,7 @@ int servoPos = 0;
 
 Ramps ramps = Ramps();
 
-void printPosition() {
+void printPosition(int result = 0) {
   Serial.print(ramps.motorX.position, DEC);
   Serial.print(" ");
   Serial.print(ramps.motorY.position, DEC);
@@ -21,6 +21,8 @@ void printPosition() {
   Serial.print(ramps.motorZ.position, DEC);
   Serial.print(" ");
   Serial.print(servoPos, DEC);
+  Serial.print(" ");
+  Serial.print(result, DEC);
   Serial.println("");
 }
 
@@ -95,8 +97,8 @@ void moveTo() {
   arg = command.next();
   int sp = atoi(arg);
 
-  ramps.moveTo(xPos, yPos, zPos, sp);
-  printPosition();
+  int res = ramps.moveTo(xPos, yPos, zPos, sp);
+  printPosition(res);
 }
 
 void rotServo() {
@@ -124,8 +126,8 @@ void drive() {
   arg = command.next();
   int sp = atoi(arg);
 
-  ramps.moveDelta(0, yPos, zPos, sp);
-  printPosition();
+  int res = ramps.moveDelta(0, yPos, zPos, sp);
+  printPosition(res);
 }
 
 void driveTillHit() {
