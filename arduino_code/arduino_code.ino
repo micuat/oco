@@ -41,14 +41,7 @@ void setup()
   digitalWrite(pin_12v0, HIGH);
   digitalWrite(pin_12v1, HIGH);
 
-  mysmartservo.begin(115200);
-  delay(5);
-  mysmartservo.assignDevIdRequest();
-  delay(50);
-  mysmartservo.moveTo(0,0,50);
-
   Serial.begin(250000);
-  Serial.println("started...");
   
   command.addCommand("home", homeX);
   command.addCommand("moveToA", moveTo);
@@ -58,6 +51,23 @@ void setup()
   command.addCommand("clearZ", clearZ);
   command.addCommand("drive", drive);
   command.addCommand("driveTillHit", driveTillHit);
+
+  delay(1000);
+  mysmartservo.begin(115200);
+  delay(5);
+  mysmartservo.assignDevIdRequest();
+  delay(50);
+  mysmartservo.moveTo(0,0,50);
+
+  delay(1000);
+  digitalWrite(pin_12v0, LOW);
+  digitalWrite(pin_12v1, LOW);
+
+  delay(1000);
+  digitalWrite(pin_12v0, HIGH);
+  digitalWrite(pin_12v1, HIGH);
+
+  Serial.println("started...");
   delay(500);
 }
 
