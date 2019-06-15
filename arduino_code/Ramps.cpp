@@ -325,7 +325,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
       motorZ.stepOff();
     }
   }
-  return 0;
+  return DONE_NORMALLY;
 }
 
 int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
@@ -408,6 +408,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
       motorZ.stepOff();
     }
   }
+  return DONE_NORMALLY;
 }
 
 void Ramps::driveTillHit(int _delay) {

@@ -89,11 +89,11 @@ void clearZ() {
 void moveTo() {
   char *arg;
   arg = command.next();
-  int xPos = atoi(arg);
+  long xPos = atol(arg);
   arg = command.next();
-  int yPos = atoi(arg);
+  long yPos = atol(arg);
   arg = command.next();
-  int zPos = atoi(arg);
+  long zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
 
@@ -118,11 +118,11 @@ void rotServo() {
 void drive() {
   char *arg;
   arg = command.next();
-  int xPos = atoi(arg);
+  long xPos = atol(arg);
   arg = command.next();
-  int yPos = atoi(arg);
+  long yPos = atol(arg);
   arg = command.next();
-  int zPos = atoi(arg);
+  long zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
 
