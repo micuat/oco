@@ -135,7 +135,7 @@ class CommandQueue {
     this.servoDelta = 2;
     this.servoDelay = 1000;
     this.hit = false;
-    this.driveDelay = 1000;
+    this.driveDelay = 100;
   }
   add(m) {
     this.queue.push(m);
@@ -163,8 +163,9 @@ class CommandQueue {
         this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
         servoState = false;
       }
-      let x = parseInt(Math.floor(p.x * this.scale));
-      let y = parseInt(Math.floor(p.y * this.scale * 0.667));
+      // flip axes
+      let x = parseInt(Math.floor(p.y * this.scale));
+      let y = parseInt(Math.floor(p.x * this.scale * 10.0));
       this.add(['moveToA', x, y]);
       if (servoState == false && p.stroke == true) {
         for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
