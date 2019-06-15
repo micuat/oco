@@ -411,7 +411,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
   return DONE_NORMALLY;
 }
 
-void Ramps::driveTillHit(int _delay) {
+int Ramps::driveTillHit(int _delay) {
 
   //stepOff van motoren
   motorY.stepOff();
@@ -428,4 +428,5 @@ void Ramps::driveTillHit(int _delay) {
     motorY.stepOff();
     motorZ.stepOff();
   }
+  return BUMPER_STOPPED;
 }

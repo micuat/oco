@@ -134,6 +134,6 @@ void driveTillHit() {
   char *arg;
   arg = command.next();
   int sp = atoi(arg);
-  ramps.driveTillHit(sp);
-  printPosition();
+  int res = ramps.driveTillHit(sp);
+  printPosition(res);
 }

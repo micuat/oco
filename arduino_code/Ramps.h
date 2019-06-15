@@ -83,7 +83,7 @@ class Ramps
 
 		int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay);
 
-    void driveTillHit(int _delay);
+    int driveTillHit(int _delay);
 
 		//declareren van motors
 		PololuStepper motorX = PololuStepper(	X_STEP_PIN, X_DIR_PIN,
