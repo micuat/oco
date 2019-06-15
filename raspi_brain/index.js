@@ -231,7 +231,6 @@ io.on('connection', (socket) => {
         cq.addPoints(msg.index);
         break;
       case 'rotate':
-      console.log("hey")
         cq.addRotate(msg.angle);
         break;
     }
