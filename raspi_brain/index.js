@@ -238,6 +238,12 @@ io.on('connection', (socket) => {
   });
 });
 
+ws.on('open', () => {
+  cq.home();
+  cq.add(['clearY']);
+  cq.add(['clearZ']);
+});
+
 ws.on('message', (data) => {
   console.log('\t\t\t\t<= ', data);
   cq.messageReceived();
