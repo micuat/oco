@@ -19,20 +19,6 @@ http.listen(settings.httpPort, () => {
   console.log('listening on *:' + settings.httpPort);
 });
 
-Gpio = null;
-console.log('skipping GPIO');
-
-if (Gpio) {
-  const button = new Gpio(6, {
-    mode: Gpio.INPUT,
-    pullUpDown: Gpio.PUD_DOWN,
-    edge: Gpio.EITHER_EDGE
-  });
-  button.on('interrupt', (level) => {
-    bm.interrupt(level);
-  });
-}
-
 class Point {
   constructor() {
     this.x = 0;
@@ -83,42 +69,6 @@ class World {
 }
 
 const world = new World();
-
-class BumperManager {
-  constructor() {
-    this.isOnWall = false;
-    this.lastTime = this.getMillis();
-    this.hitThreshold = 100;
-  }
-
-  getMillis() {
-    return Date.now();
-  }
-
-  interrupt(level) {
-    const t = this.getMillis();
-    if (level == '1' && this.isOnWall == false) {
-      if (t - this.lastTime < this.hitThreshold) {
-        console.log('misdetection');
-        io.emit('bumper', { status: 'misdetection' });
-      }
-      else {
-        console.log('hit');
-        io.emit('bumper', { status: 'hit' });
-        this.isOnWall = true;
-        this.lastTime = t;
-        cq.hit = true;
-      }
-    }
-    else if (level == '0' && this.isOnWall == true) {
-      console.log('released');
-      io.emit('bumper', { status: 'released' });
-      this.isOnWall = false;
-    }
-  }
-}
-
-const bm = new BumperManager();
 
 class CommandQueue {
   constructor() {
@@ -256,18 +206,8 @@ class CommandQueue {
     if (this.isEmpty() && this.driveTillHitFlag) {
       this.driveTillHitFlag = false;
       this.hit = false;
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addMove(0, -this.driveSteps);
-      this.addRotate(30);
-      this.addRotate(30);
-      this.addRotate(30);
+      this.addMove(0, -this.driveSteps * 9);
+      this.addRotate(90);
     }
   }
 }
@@ -303,16 +243,4 @@ ws.on('message', (data) => {
   cq.messageReceived();
   const p = data.split(' ');
   io.emit('position', { x: p[0], y: p[1], z: p[2] });
-});
-
-process.stdin.setRawMode = true;
-process.stdin.resume();
-process.stdin.on('data', (data) => {
-  const byteArray = [...data]
-  if (byteArray.length > 0 && byteArray[0] === 48) {
-    bm.interrupt('0');
-  }
-  if (byteArray.length > 0 && byteArray[0] === 49) {
-    bm.interrupt('1');
-  }
 });

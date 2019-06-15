@@ -8,9 +8,6 @@
     "socket.io": "^2.2.0",
     "ws": "^7.0.0"
   },
-  "optionalDependencies": {
-    "pigpio": "^1.2.2"
-  },
   "devDependencies": {},
   "scripts": {
     "start": "node index.js",
