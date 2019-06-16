@@ -10,10 +10,11 @@ MeSmartServo mysmartservo(PORT5); // somehow goes to tx2/rx2 of mega
 SerialCommand command;
 
 int servoPos = 0;
+int STATUS_UNKNOWN = 3;
 
 Ramps ramps = Ramps();
 
-void printPosition(int result = 0) {
+void printPosition(int result) {
   Serial.print(ramps.motorX.position, DEC);
   Serial.print(" ");
   Serial.print(ramps.motorY.position, DEC);
@@ -51,6 +52,7 @@ void setup()
   command.addCommand("clearZ", clearZ);
   command.addCommand("drive", drive);
   command.addCommand("driveTillHit", driveTillHit);
+  command.addCommand("wait", wait);
 
   delay(1000);
   mysmartservo.begin(115200);
@@ -83,17 +85,17 @@ void homeX() {
 
 void clearX() {
   ramps.motorX.position = 0;
-  printPosition();
+  printPosition(STATUS_UNKNOWN);
 }
 
 void clearY() {
   ramps.motorY.position = 0;
-  printPosition();
+  printPosition(STATUS_UNKNOWN);
 }
 
 void clearZ() {
   ramps.motorZ.position = 0;
-  printPosition();
+  printPosition(STATUS_UNKNOWN);
 }
 
 void moveTo() {
@@ -106,8 +108,10 @@ void moveTo() {
   long zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
+  arg = command.next();
+  bool ignoreBumper = atoi(arg) > 0;
 
-  int res = ramps.moveTo(xPos, yPos, zPos, sp);
+  int res = ramps.moveTo(xPos, yPos, zPos, sp, ignoreBumper);
   printPosition(res);
 }
 
@@ -122,7 +126,7 @@ void rotServo() {
 
   mysmartservo.moveTo(0,-servoPos,delta);
   delay(sleepMs);
-  printPosition();
+  printPosition(STATUS_UNKNOWN);
 }
 
 void drive() {
@@ -135,8 +139,10 @@ void drive() {
   long zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
+  arg = command.next();
+  bool ignoreBumper = atoi(arg) > 0;
 
-  int res = ramps.moveDelta(0, yPos, zPos, sp);
+  int res = ramps.moveDelta(0, yPos, zPos, sp, ignoreBumper);
   printPosition(res);
 }
 
@@ -146,4 +152,12 @@ void driveTillHit() {
   int sp = atoi(arg);
   int res = ramps.driveTillHit(sp);
   printPosition(res);
+}
+
+void wait() {
+  char *arg;
+  arg = command.next();
+  long msec = atol(arg);
+  delay(msec);
+  printPosition(STATUS_UNKNOWN);
 }

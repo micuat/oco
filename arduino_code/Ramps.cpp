@@ -169,7 +169,7 @@ void Ramps::homeX(int _delay)
   motorX.position = 0;
 }
 
-int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
+int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper)
 {
 
   //stepOff van motoren
@@ -224,7 +224,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
@@ -260,7 +260,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorZ zal altijd stappen
@@ -296,7 +296,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
@@ -328,7 +328,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay = 500)
   return DONE_NORMALLY;
 }
 
-int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
+int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper)
 {
 
   //stepOff van motoren
@@ -362,7 +362,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
   {
     while (dispZ != deltaZ)
     {
-      if (digitalRead(pin_bumper0) == LOW) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorZ zal altijd stappen
@@ -387,7 +387,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay = 500)
   {
     while (dispY != deltaY)
     {
-      if (digitalRead(pin_bumper0) == LOW) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
