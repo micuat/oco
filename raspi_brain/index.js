@@ -6,6 +6,13 @@ const loadJson = (f) => {
 const settings = loadJson('settings.json');
 const points = loadJson('points.json');
 
+const Status = {
+  normal: 0,
+  x_stopped: 1,
+  bumper_stopped: 2,
+  unknown: 3
+}
+
 const autopilot = settings.autopilot == true;
 
 const WebSocket = require('ws');
@@ -105,11 +112,14 @@ class CommandQueue {
       this.servoUp();
     }
   }
-  driveTillHit() {
-    this.add({ command: 'driveTillHit' });
+  uturn() {
     this.add({ command: 'drive', x: 0, y: -this.driveSteps * 9, ignoreBumper: 1 });
     this.add({ command: 'rotate', deg: 90, ignoreBumper: 0 });
-}
+  }
+  driveTillHit() {
+    this.add({ command: 'driveTillHit' });
+    this.uturn();
+  }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
   }
@@ -125,6 +135,9 @@ class CommandQueue {
   }
   isEmpty() {
     return this.queue.length == 0;
+  }
+  clear() {
+    this.queue.length = 0;
   }
   pop() {
     return this.queue.shift();
@@ -145,7 +158,7 @@ const cq = new CommandQueue();
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  if(autopilot == false) {
+  if (autopilot == false) {
     socket.on('client', (msg) => {
       console.log('message: ' + msg.command);
       switch (msg.command) {
@@ -175,8 +188,8 @@ ws.on('open', () => {
   cq.add({ command: 'clearY' });
   cq.add({ command: 'clearZ' });
 
-  if(autopilot) {
-    
+  if (autopilot) {
+
   }
 });
 
@@ -184,5 +197,18 @@ ws.on('message', (data) => {
   console.log('\t\t\t\t<= ', data);
   cq.messageReceived();
   const p = data.split(' ');
-  io.emit('position', { x: p[0], y: p[1], z: p[2] });
+  let x = p[0];
+  let y = p[1];
+  let z = p[2];
+  let servo = p[3];
+  let status = p[4];
+  if (status == Status.x_stopped) {
+    cq.clear();
+    cq.add({ command: 'home' });
+  }
+  if (status == Status.bumper_stopped) {
+    cq.clear();
+    cq.uturn();
+  }
+  io.emit('position', { x, y, z });
 });
