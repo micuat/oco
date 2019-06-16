@@ -23,7 +23,6 @@ class CommandQueue {
   constructor() {
     this.queue = [];
     this.isWaitingForReply = false;
-    this.driveTillHitFlag = false;
     this.driveSteps = 1000;
     this.handler = setInterval(() => {
       this.next();
@@ -53,16 +52,16 @@ class CommandQueue {
         this.send('clearZ');
       },
       moveToA: (command) => {
-        this.send(`moveToA ${command.x} ${command.y} ${command.y} ${this.driveDelay}`);
+        this.send(`moveToA ${command.x} ${command.y} ${command.y} ${this.driveDelay} ${command.ignoreBumper}`);
       },
       drive: (command) => {
-        this.send(`drive ${command.x} ${command.y} ${command.y} ${this.driveDelay}`);
+        this.send(`drive ${command.x} ${command.y} ${command.y} ${this.driveDelay} ${command.ignoreBumper}`);
       },
       driveTillHit: (command) => {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        this.send(`drive 0 ${command.deg * 1800} ${-command.deg * 1800} ${this.driveDelay}`);
+        this.send(`drive 0 ${command.deg * 1800} ${-command.deg * 1800} ${this.driveDelay} ${command.ignoreBumper}`);
       },
       servo: (command) => {
         this.send(`servo ${command.deg} ${command.delta} ${command.delay}`);
@@ -95,7 +94,7 @@ class CommandQueue {
       // flip axes
       let x = parseInt(Math.floor(p.y * this.scale));
       let y = parseInt(Math.floor(p.x * this.scale * 10.0));
-      this.add({ command: 'moveToA', x, y });
+      this.add({ command: 'moveToA', x, y, ignoreBumper: 0 });
       if (this.servoState == false && p.stroke == true) {
         this.servoDown();
       }
@@ -105,9 +104,10 @@ class CommandQueue {
     }
   }
   driveTillHit() {
-    this.driveTillHitFlag = true;
     this.add({ command: 'driveTillHit' });
-  }
+    this.add({ command: 'drive', x: 0, y: -this.driveSteps * 9, ignoreBumper: 1 });
+    this.add({ command: 'rotate', deg: 90, ignoreBumper: 0 });
+}
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
   }
@@ -137,12 +137,6 @@ class CommandQueue {
       this.execCommand[command.command](command);
       this.messageJustSent();
     }
-    if (this.isEmpty() && this.driveTillHitFlag) {
-      this.driveTillHitFlag = false;
-      this.hit = false;
-      this.add({ command: 'drive', x: 0, y: -this.driveSteps * 9 });
-      this.add({ command: 'rotate', deg: 90 });
-    }
   }
 }
 const cq = new CommandQueue();
@@ -156,7 +150,7 @@ io.on('connection', (socket) => {
         cq.add({ command: 'home' });
         break;
       case 'drive':
-        cq.add({ command: 'drive', x: 0, y: msg.steps });
+        cq.add({ command: 'drive', x: 0, y: msg.steps, ignoreBumper: 0 });
         break;
       case 'driveTillHit':
         cq.driveTillHit();
@@ -165,7 +159,7 @@ io.on('connection', (socket) => {
         cq.addPoints(msg.index);
         break;
       case 'rotate':
-        cq.add({ command: 'rotate', deg: msg.angle });
+        cq.add({ command: 'rotate', deg: msg.angle, ignoreBumper: 0 });
         break;
     }
   });
