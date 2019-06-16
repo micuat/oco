@@ -6,6 +6,8 @@ const loadJson = (f) => {
 const settings = loadJson('settings.json');
 const points = loadJson('points.json');
 
+const autopilot = settings.autopilot == true;
+
 const WebSocket = require('ws');
 const ws = new WebSocket(settings.wsUrl);
 
@@ -143,26 +145,28 @@ const cq = new CommandQueue();
 
 io.on('connection', (socket) => {
   console.log('a user connected');
-  socket.on('client', (msg) => {
-    console.log('message: ' + msg.command);
-    switch (msg.command) {
-      case 'home':
-        cq.add({ command: 'home' });
-        break;
-      case 'drive':
-        cq.add({ command: 'drive', x: 0, y: msg.steps, ignoreBumper: 0 });
-        break;
-      case 'driveTillHit':
-        cq.driveTillHit();
-        break;
-      case 'letter':
-        cq.addPoints(msg.index);
-        break;
-      case 'rotate':
-        cq.add({ command: 'rotate', deg: msg.angle, ignoreBumper: 0 });
-        break;
-    }
-  });
+  if(autopilot == false) {
+    socket.on('client', (msg) => {
+      console.log('message: ' + msg.command);
+      switch (msg.command) {
+        case 'home':
+          cq.add({ command: 'home' });
+          break;
+        case 'drive':
+          cq.add({ command: 'drive', x: 0, y: msg.steps, ignoreBumper: 0 });
+          break;
+        case 'driveTillHit':
+          cq.driveTillHit();
+          break;
+        case 'letter':
+          cq.addPoints(msg.index);
+          break;
+        case 'rotate':
+          cq.add({ command: 'rotate', deg: msg.angle, ignoreBumper: 0 });
+          break;
+      }
+    });
+  }
 });
 
 ws.on('open', () => {
@@ -170,6 +174,10 @@ ws.on('open', () => {
   cq.add({ command: 'home' });
   cq.add({ command: 'clearY' });
   cq.add({ command: 'clearZ' });
+
+  if(autopilot) {
+    
+  }
 });
 
 ws.on('message', (data) => {
