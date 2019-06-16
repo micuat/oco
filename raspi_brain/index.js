@@ -70,7 +70,7 @@ class CommandQueue {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        this.send(`drive 0 ${command.deg * 1800} ${-command.deg * 1800} ${this.driveDelay} ${command.ignoreBumper}`);
+        this.send(`drive 0 ${command.deg * 900} ${-command.deg * 900} ${this.driveDelay} ${command.ignoreBumper}`);
       },
       servo: (command) => {
         this.send(`servo ${command.deg} ${command.delta} ${command.delay}`);
@@ -173,6 +173,9 @@ io.on('connection', (socket) => {
           break;
         case 'letter':
           cq.addPoints(msg.index);
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'clearY' });
+          cq.add({ command: 'clearZ' });
           break;
         case 'rotate':
           cq.add({ command: 'rotate', deg: msg.angle, ignoreBumper: 0 });
@@ -189,7 +192,21 @@ ws.on('open', () => {
   cq.add({ command: 'clearZ' });
 
   if (autopilot) {
-
+    setInterval(() => {
+      if(cq.isEmpty()) {
+        if(Math.random() > 0.25) {
+          cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'clearY' });
+          cq.add({ command: 'clearZ' });
+        }
+        else {
+          cq.driveTillHit();
+          cq.add({ command: 'clearY' });
+          cq.add({ command: 'clearZ' });
+        }
+      }
+    }, 1000);
   }
 });
 
