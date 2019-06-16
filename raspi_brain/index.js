@@ -40,6 +40,9 @@ class CommandQueue {
       home: (command) => {
         this.send('home');
       },
+      wait: (command) => {
+        this.send(`wait ${command.delay}`);
+      },
       clearX: (command) => {
         this.send('clearX');
       },
@@ -68,9 +71,6 @@ class CommandQueue {
   }
   add(m) {
     this.queue.push(m);
-  }
-  home() {
-    this.add({ command: 'home' });
   }
   servoDown() {
     for (let i = this.servoAngleOff; i <= this.servoAngleOn; i += 2) {
@@ -153,7 +153,7 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg.command);
     switch (msg.command) {
       case 'home':
-        cq.home();
+        cq.add({ command: 'home' });
         break;
       case 'drive':
         cq.add({ command: 'drive', x: 0, y: msg.steps });
@@ -173,7 +173,7 @@ io.on('connection', (socket) => {
 
 ws.on('open', () => {
   cq.servoUp();
-  cq.home();
+  cq.add({ command: 'home' });
   cq.add({ command: 'clearY' });
   cq.add({ command: 'clearZ' });
 });
