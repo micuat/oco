@@ -69,12 +69,6 @@ class CommandQueue {
   add(m) {
     this.queue.push(m);
   }
-  addMove(x, y) {
-    this.add({ command: 'drive', x, y });
-  }
-  addRotate(deg) {
-    this.add({ command: 'rotate', deg });
-  }
   home() {
     this.add({ command: 'home' });
   }
@@ -146,8 +140,8 @@ class CommandQueue {
     if (this.isEmpty() && this.driveTillHitFlag) {
       this.driveTillHitFlag = false;
       this.hit = false;
-      this.addMove(0, -this.driveSteps * 9);
-      this.addRotate(90);
+      this.add({ command: 'drive', x: 0, y: -this.driveSteps * 9 });
+      this.add({ command: 'rotate', deg: 90 });
     }
   }
 }
@@ -162,7 +156,7 @@ io.on('connection', (socket) => {
         cq.home();
         break;
       case 'drive':
-        cq.addMove(0, msg.steps);
+        cq.add({ command: 'drive', x: 0, y: msg.steps });
         break;
       case 'driveTillHit':
         cq.driveTillHit();
@@ -171,7 +165,7 @@ io.on('connection', (socket) => {
         cq.addPoints(msg.index);
         break;
       case 'rotate':
-        cq.addRotate(msg.angle);
+        cq.add({ command: 'rotate', deg: msg.angle });
         break;
     }
   });
