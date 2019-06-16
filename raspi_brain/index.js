@@ -50,19 +50,19 @@ class CommandQueue {
         this.send('clearZ');
       },
       moveToA: (command) => {
-        this.send(`moveToA ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
+        this.send(`moveToA ${command.x} ${command.y} ${command.y} ${this.driveDelay}`);
       },
       drive: (command) => {
-        this.send(`drive ${command[1]} ${command[2]} ${command[2]} ${this.driveDelay}`);
+        this.send(`drive ${command.x} ${command.y} ${command.y} ${this.driveDelay}`);
       },
       driveTillHit: (command) => {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        this.send(`drive 0 ${command[1] * 1800} -${command[1] * 1800} ${this.driveDelay}`);
+        this.send(`drive 0 ${command.deg * 1800} ${-command.deg * 1800} ${this.driveDelay}`);
       },
       servo: (command) => {
-        this.send(`servo ${command[1]} ${command[2]} ${command[3]}`);
+        this.send(`servo ${command.deg} ${command.delta} ${command.delay}`);
       },
     }
   }
@@ -70,51 +70,49 @@ class CommandQueue {
     this.queue.push(m);
   }
   addMove(x, y) {
-    this.add(['drive', x, y]);
+    this.add({command: 'drive', x, y});
   }
-  addRotate(t) {
-    this.add(['rotate', t]);
+  addRotate(deg) {
+    this.add({command: 'rotate', deg});
   }
   home() {
-    this.add(['home']);
+    this.add({command: 'home'});
+  }
+  servoDown() {
+    for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
+      this.add({command: 'servo', deg: i, delta: this.servoDelta, delay: 0});
+    }
+    this.add({command: 'servo', deg: this.servoAngleOn, delta: this.servoDelta, delay: this.servoDelay});
+    this.servoState = true;
+  }
+  servoUp() {
+    for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
+      this.add({command: 'servo', deg: i, delta: this.servoDelta, delay: 0});
+    }
+    this.add({command: 'servo', deg: this.servoAngleOff, delta: this.servoDelta, delay: this.servoDelay});
+    this.servoState = false;
   }
   addPoints(index) {
-    for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
-      this.add(['servo', i, this.servoDelta, 0]);
-    }
-    this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
-    let servoState = false;
+    this.servoUp();
     for (const p of points[index]) {
-      if (servoState == true && p.stroke == false) {
-        for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
-          this.add(['servo', i, this.servoDelta, 0]);
-        }
-        this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
-        servoState = false;
+      if (this.servoState == true && p.stroke == false) {
+        this.servoUp();
       }
       // flip axes
       let x = parseInt(Math.floor(p.y * this.scale));
       let y = parseInt(Math.floor(p.x * this.scale * 10.0));
-      this.add(['moveToA', x, y]);
-      if (servoState == false && p.stroke == true) {
-        for(let i = this.servoAngleOff; i <= this.servoAngleOn; i+=2) {
-          this.add(['servo', i, this.servoDelta, 0]);
-        }
-        this.add(['servo', this.servoAngleOn, this.servoDelta, this.servoDelay]);
-        servoState = true;
+      this.add({command: 'moveToA', x, y});
+      if (this.servoState == false && p.stroke == true) {
+        this.servoDown();
       }
     }
-    if(servoState == true) {
-      for(let i = this.servoAngleOn; i >= this.servoAngleOff; i-=2) {
-        this.add(['servo', i, this.servoDelta, 0]);
-      }
-      this.add(['servo', this.servoAngleOff, this.servoDelta, this.servoDelay]);
-      servoState = false;
+    if(this.servoState == true) {
+      this.servoUp();
     }
   }
   driveTillHit() {
     this.driveTillHitFlag = true;
-    this.add(['driveTillHit']);
+    this.add({command: 'driveTillHit'});
   }
   isMessageSendable() {
     return this.isWaitingForReply == false && this.isEmpty() == false;
@@ -142,7 +140,7 @@ class CommandQueue {
   next() {
     if (this.isMessageSendable()) {
       const command = this.pop();
-      this.execCommand[command[0]](command);
+      this.execCommand[command.command](command);
       this.messageJustSent();
     }
     if (this.isEmpty() && this.driveTillHitFlag) {
@@ -180,9 +178,10 @@ io.on('connection', (socket) => {
 });
 
 ws.on('open', () => {
+  cq.servoUp();
   cq.home();
-  cq.add(['clearY']);
-  cq.add(['clearZ']);
+  cq.add({command: 'clearY'});
+  cq.add({command: 'clearZ'});
 });
 
 ws.on('message', (data) => {
