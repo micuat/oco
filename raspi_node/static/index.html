@@ -109,17 +109,17 @@
     const cq = new CommandQueue();
 
     function moveCommand(x, y, z) {
-      return "moveToA " + x + " " + y + " " + z + " 1000";
+      return "drive " + x + " " + y + " " + z + " 100";
     }
 
     setInterval(() => {
       cq.next();
-    }, 100);
+    }, 10);
 
     $("#forward").on("click", () => {
-      cq.add("clearY");
-      cq.add("clearZ");
-      cq.add(moveCommand(0, 10000, 10000));
+      for(let i = 0; i < 10; i++) {
+        cq.add(moveCommand(0, 10000, 10000));
+      }
       cq.add("clearY");
       cq.add("clearZ");
     });
@@ -141,9 +141,9 @@
     });
 
     $("#backward").on("click", () => {
-      cq.add("clearY");
-      cq.add("clearZ");
-      cq.add(moveCommand(0, -10000, -10000));
+      for(let i = 0; i < 10; i++) {
+        cq.add(moveCommand(0, -10000, -10000));
+      }
       cq.add("clearY");
       cq.add("clearZ");
     });
