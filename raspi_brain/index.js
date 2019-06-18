@@ -192,18 +192,32 @@ ws.on('open', () => {
   cq.add({ command: 'clearZ' });
 
   if (autopilot) {
+    let lastCommand = 'write';
+
     setInterval(() => {
       if(cq.isEmpty()) {
-        if(Math.random() > 0.25) {
+        if(lastCommand == 'drive') {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
           cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
+          lastCommand = 'write';
         }
         else {
-          cq.driveTillHit();
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
+          let deg = 0;
+          if(Math.random() > 0.5) {
+            deg = 180 - Math.random() * 90;
+          }
+          else {
+            deg = -180 + Math.random() * 90;
+          }
+          cq.add({ command: 'rotate', deg, ignoreBumper: 0 });
+          cq.add({ command: 'clearY' });
+          cq.add({ command: 'clearZ' });
+          lastCommand = 'drive';
         }
       }
     }, 1000);
