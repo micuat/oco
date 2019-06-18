@@ -37,8 +37,8 @@ class CommandQueue {
       this.next();
     }, 10);
     this.scale = 40;
-    this.servoAngleOn = 80;
-    this.servoAngleOff = 0;
+    this.servoAngleOn = 80+20;
+    this.servoAngleOff = 0+20;
     this.servoDelta = 2;
     this.servoDelay = 1000;
     this.hit = false;
