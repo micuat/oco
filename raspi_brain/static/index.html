@@ -31,7 +31,7 @@
       });
       buttons.drive = createButton('drive');
       buttons.drive.mousePressed(() => {
-        socket.emit('client', { command: 'drive', steps: 800 })
+        socket.emit('client', { command: 'drive', steps: 10000 })
       });
       buttons.driveTillHit = createButton('drive till hit');
       buttons.driveTillHit.mousePressed(() => {
@@ -39,7 +39,7 @@
       });
       buttons.letter = createButton('letter');
       buttons.letter.mousePressed(() => {
-        socket.emit('client', { command: 'letter', index: parseInt(Math.random() * 4) })
+        socket.emit('client', { command: 'letter', index: parseInt(Math.random() * 7) })
       });
       buttons.left = createButton('left');
       buttons.left.mousePressed(() => {
