@@ -199,7 +199,7 @@ ws.on('open', () => {
       if(cq.isEmpty()) {
         if(lastCommand == 'drive') {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
-          cq.add({ command: 'moveToA', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
           // next command should be random?
@@ -219,7 +219,9 @@ ws.on('open', () => {
           else {
             deg = -180 + Math.random() * 90;
           }
-          cq.add({ command: 'rotate', deg, ignoreBumper: 0 });
+          for(let i = 0; i < 10; i++) {
+            cq.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 0 });
+          }
 
           // distance should be random
           cq.add({ command: 'drive', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
