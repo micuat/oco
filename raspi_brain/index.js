@@ -42,7 +42,7 @@ class CommandQueue {
     this.servoDelta = 2;
     this.servoDelay = 1000;
     this.hit = false;
-    this.driveDelay = 100;
+    this.driveDelay = 10;
 
     this.execCommand = {
       home: (command) => {
@@ -70,7 +70,7 @@ class CommandQueue {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        this.send(`drive 0 ${command.deg * 900} ${-command.deg * 900} ${this.driveDelay} ${command.ignoreBumper}`);
+        this.send(`drive 0 ${parseInt(command.deg * 19000.0 / 9.0)} ${-parseInt(command.deg * 19000.0 / 9.0)} ${this.driveDelay} ${command.ignoreBumper}`);
       },
       servo: (command) => {
         this.send(`servo ${command.deg} ${command.delta} ${command.delay}`);
@@ -195,18 +195,23 @@ ws.on('open', () => {
     let lastCommand = 'write';
 
     setInterval(() => {
+      const unit = 40; //800
       if(cq.isEmpty()) {
         if(lastCommand == 'drive') {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'moveToA', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
+          // next command should be random?
           lastCommand = 'write';
         }
         else {
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
-          cq.add({ command: 'clearY' });
-          cq.add({ command: 'clearZ' });
+          // distance should be random
+          for(let i = 0; i < 5; i++) {
+            cq.add({ command: 'drive', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
+          }
+
+          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * 10.0, ignoreBumper: 0 });
           let deg = 0;
           if(Math.random() > 0.5) {
             deg = 180 - Math.random() * 90;
@@ -215,6 +220,10 @@ ws.on('open', () => {
             deg = -180 + Math.random() * 90;
           }
           cq.add({ command: 'rotate', deg, ignoreBumper: 0 });
+
+          // distance should be random
+          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
+
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
           lastCommand = 'drive';
