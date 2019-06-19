@@ -102,7 +102,7 @@ class CommandQueue {
         this.servoUp();
       }
       // flip axes
-      let x = parseInt(Math.floor(p.y * this.scale));
+      let x = parseInt(Math.floor((400-p.y) * this.scale));
       let y = parseInt(Math.floor(p.x * this.scale * cq.yScale));
       this.add({ command: 'moveToA', x, y, ignoreBumper: 0 });
       if (this.servoState == false && p.stroke == true) {
@@ -193,18 +193,19 @@ ws.on('open', () => {
   cq.add({ command: 'clearZ' });
 
   if (autopilot) {
-    let lastCommand = 'write';
+    let lastCommand = 0;
 
     setInterval(() => {
       const unit = 40; //800
       if(cq.isEmpty()) {
-        if(lastCommand == 'drive') {
+        if(lastCommand < 7) {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * cq.yScale, ignoreBumper: 0 });
+          cq.add({ command: 'home' });
+          cq.add({ command: 'moveToA', x: 0, y: 300 * cq.scale * cq.yScale, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
           // next command should be random?
-          lastCommand = 'write';
+          lastCommand += 1;
         }
         else {
           // distance should be random
@@ -229,7 +230,7 @@ ws.on('open', () => {
 
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
-          lastCommand = 'drive';
+          lastCommand = 0;
         }
       }
     }, 1000);
