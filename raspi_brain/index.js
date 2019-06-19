@@ -43,6 +43,7 @@ class CommandQueue {
     this.servoDelay = 1000;
     this.hit = false;
     this.driveDelay = 10;
+    this.yScale = 1;
 
     this.execCommand = {
       home: (command) => {
@@ -102,7 +103,7 @@ class CommandQueue {
       }
       // flip axes
       let x = parseInt(Math.floor(p.y * this.scale));
-      let y = parseInt(Math.floor(p.x * this.scale * 10.0));
+      let y = parseInt(Math.floor(p.x * this.scale * cq.yScale));
       this.add({ command: 'moveToA', x, y, ignoreBumper: 0 });
       if (this.servoState == false && p.stroke == true) {
         this.servoDown();
@@ -173,7 +174,7 @@ io.on('connection', (socket) => {
           break;
         case 'letter':
           cq.addPoints(msg.index);
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * cq.yScale, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
           break;
@@ -199,7 +200,7 @@ ws.on('open', () => {
       if(cq.isEmpty()) {
         if(lastCommand == 'drive') {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * cq.yScale, ignoreBumper: 0 });
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });
           // next command should be random?
@@ -208,10 +209,10 @@ ws.on('open', () => {
         else {
           // distance should be random
           for(let i = 0; i < 5; i++) {
-            cq.add({ command: 'drive', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
+            cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
           }
 
-          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
           let deg = 0;
           if(Math.random() > 0.5) {
             deg = 180 - Math.random() * 90;
@@ -224,7 +225,7 @@ ws.on('open', () => {
           }
 
           // distance should be random
-          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * 10.0, ignoreBumper: 0 });
+          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
 
           cq.add({ command: 'clearY' });
           cq.add({ command: 'clearZ' });

@@ -32,6 +32,8 @@ int pin_12v1 = 9;
 
 int pin_bumper0 = 23;
 
+long yScale = 10;
+
 void setup()
 {
   pinMode(pin_bumper0, INPUT_PULLUP);
@@ -103,9 +105,9 @@ void moveTo() {
   arg = command.next();
   long xPos = atol(arg);
   arg = command.next();
-  long yPos = atol(arg);
+  long yPos = atol(arg) * yScale;
   arg = command.next();
-  long zPos = atol(arg);
+  long zPos = atol(arg) * yScale;
   arg = command.next();
   int sp = atoi(arg);
   arg = command.next();
@@ -134,9 +136,9 @@ void drive() {
   arg = command.next();
   long xPos = atol(arg);
   arg = command.next();
-  long yPos = atol(arg);
+  long yPos = atol(arg) * yScale;
   arg = command.next();
-  long zPos = atol(arg);
+  long zPos = atol(arg) * yScale;
   arg = command.next();
   int sp = atoi(arg);
   arg = command.next();
