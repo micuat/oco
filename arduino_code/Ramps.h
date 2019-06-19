@@ -61,6 +61,9 @@ class Ramps
     const int X_STOPPED = 1;
     const int BUMPER_STOPPED = 2;
     const int switch_threshold = 100;
+
+    const long yScale = 1;
+
     int pin_bumper0;
 		//Constructor
 		Ramps();

@@ -32,8 +32,6 @@ int pin_12v1 = 9;
 
 int pin_bumper0 = 23;
 
-long yScale = 10;
-
 void setup()
 {
   pinMode(pin_bumper0, INPUT_PULLUP);
@@ -100,14 +98,15 @@ void clearZ() {
   printPosition(STATUS_UNKNOWN);
 }
 
+long xPos, yPos, zPos;
 void moveTo() {
   char *arg;
   arg = command.next();
-  long xPos = atol(arg);
+  xPos = atol(arg);
   arg = command.next();
-  long yPos = atol(arg) * yScale;
+  yPos = atol(arg);
   arg = command.next();
-  long zPos = atol(arg) * yScale;
+  zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
   arg = command.next();
@@ -134,11 +133,11 @@ void rotServo() {
 void drive() {
   char *arg;
   arg = command.next();
-  long xPos = atol(arg);
+  xPos = atol(arg);
   arg = command.next();
-  long yPos = atol(arg) * yScale;
+  yPos = atol(arg);
   arg = command.next();
-  long zPos = atol(arg) * yScale;
+  zPos = atol(arg);
   arg = command.next();
   int sp = atoi(arg);
   arg = command.next();

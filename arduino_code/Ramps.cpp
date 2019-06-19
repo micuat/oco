@@ -181,34 +181,38 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
   long deltaY = targetY - motorY.position;
   long deltaZ = targetZ - motorZ.position;
 
-  long dispX = 0;
-  long dispY = 0;
-  long dispZ = 0;
+  long dispX = 0L;
+  long dispY = 0L;
+  long dispZ = 0L;
 
-  if (deltaX < 0)
+  long errorX = 0L;
+  long errorY = 0L;
+  long errorZ = 0L;
+
+  if (deltaX < 0L)
   {
     motorX.setDir(-1);
-    deltaX *= -1;
+    deltaX *= -1L;
   }
   else
   {
     motorX.setDir(1);
   }
 
-  if (deltaY < 0)
+  if (deltaY < 0L)
   {
     motorY.setDir(-1);
-    deltaY *= -1;
+    deltaY *= -1L;
   }
   else
   {
     motorY.setDir(1);
   }
 
-  if (deltaZ < 0)
+  if (deltaZ < 0L)
   {
     motorZ.setDir(-1);
-    deltaZ *= -1;
+    deltaZ *= -1L;
   }
   else
   {
@@ -231,14 +235,14 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       motorX.stepOn();
       dispX++;
 
-      if (dispX * deltaY / deltaX > dispY)
+      if (dispX * deltaY > dispY * deltaX)
       {
         //motor Y stapt
         motorY.stepOn();
         dispY++;
       }
 
-      if (dispX * deltaZ / deltaX > dispZ)
+      if (dispX * deltaZ > dispZ * deltaX)
       {
         //motor Z stapt
         motorZ.stepOn();
@@ -267,14 +271,14 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       motorZ.stepOn();
       dispZ++;
 
-      if (dispZ * deltaX / deltaZ > motorX.position)
+      if (dispZ * deltaX > dispX * deltaZ)
       {
         //motor X stapt
         motorX.stepOn();
         dispX++;
       }
 
-      if (dispZ * deltaY / deltaZ > dispY)
+      if (dispZ * deltaY > dispY * deltaZ)
       {
         //motor Y stapt
         motorY.stepOn();
@@ -303,14 +307,14 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       motorY.stepOn();
       dispY++;
 
-      if (dispY * deltaX / deltaY > dispX)
+      if (dispY * deltaX > dispX * deltaY)
       {
         //motor X stapt
         motorX.stepOn();
         dispX++;
       }
 
-      if (dispY * deltaZ / deltaY > dispZ)
+      if (dispY * deltaZ > dispZ * deltaY)
       {
         //motor Z stapt
         motorZ.stepOn();
@@ -335,23 +339,23 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   motorY.stepOff();
   motorZ.stepOff();
 
-  long dispY = 0;
-  long dispZ = 0;
+  long dispY = 0L;
+  long dispZ = 0L;
 
-  if (deltaY < 0)
+  if (deltaY < 0L)
   {
     motorY.setDir(-1);
-    deltaY *= -1;
+    deltaY *= -1L;
   }
   else
   {
     motorY.setDir(1);
   }
 
-  if (deltaZ < 0)
+  if (deltaZ < 0L)
   {
     motorZ.setDir(-1);
-    deltaZ *= -1;
+    deltaZ *= -1L;
   }
   else
   {
@@ -369,7 +373,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
       motorZ.stepOn(true);
       dispZ++;
 
-      if (dispZ * deltaY / deltaZ > dispY)
+      if (dispZ * deltaY > dispY * deltaZ)
       {
         //motor Y stapt
         motorY.stepOn(true);
@@ -394,7 +398,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
       motorY.stepOn(true);
       dispY++;
 
-      if (dispY * deltaZ / deltaY > dispZ)
+      if (dispY * deltaZ > dispZ * deltaY)
       {
         //motor Z stapt
         motorZ.stepOn(true);
