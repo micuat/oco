@@ -109,7 +109,7 @@
     const cq = new CommandQueue();
 
     function moveCommand(x, y, z) {
-      return "drive " + x + " " + y + " " + z + " 100";
+      return "drive " + x + " " + y + " " + z + " 50 0";
     }
 
     setInterval(() => {
@@ -117,8 +117,8 @@
     }, 10);
 
     $("#forward").on("click", () => {
-      for(let i = 0; i < 10; i++) {
-        cq.add(moveCommand(0, 10000, 10000));
+      for(let i = 0; i < 1; i++) {
+        cq.add(moveCommand(0, 100000, 100000));
       }
       cq.add("clearY");
       cq.add("clearZ");
@@ -127,7 +127,7 @@
     $("#left").on("click", () => {
       cq.add("clearY");
       cq.add("clearZ");
-      cq.add(moveCommand(0, -10000, 10000));
+      cq.add(moveCommand(0, -100000, 100000));
       cq.add("clearY");
       cq.add("clearZ");
     });
@@ -135,14 +135,14 @@
     $("#right").on("click", () => {
       cq.add("clearY");
       cq.add("clearZ");
-      cq.add(moveCommand(0, 10000, -10000));
+      cq.add(moveCommand(0, 100000, -100000));
       cq.add("clearY");
       cq.add("clearZ");
     });
 
     $("#backward").on("click", () => {
-      for(let i = 0; i < 10; i++) {
-        cq.add(moveCommand(0, -10000, -10000));
+      for(let i = 0; i < 1; i++) {
+        cq.add(moveCommand(0, -100000, -100000));
       }
       cq.add("clearY");
       cq.add("clearZ");

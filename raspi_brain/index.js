@@ -42,8 +42,8 @@ class CommandQueue {
     this.servoDelta = 2;
     this.servoDelay = 1000;
     this.hit = false;
-    this.driveDelay = 10;
-    this.yScale = 1;
+    this.driveDelay = 100;
+    this.yScale = 10;
 
     this.execCommand = {
       home: (command) => {
