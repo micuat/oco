@@ -103,7 +103,7 @@ class CommandQueue {
       }
       // flip axes
       let x = parseInt(Math.floor((400-p.y) * this.scale));
-      let y = parseInt(Math.floor(p.x * this.scale * cq.yScale));
+      let y = parseInt(Math.floor((300-p.x) * this.scale * cq.yScale));
       this.add({ command: 'moveToA', x, y, ignoreBumper: 0 });
       if (this.servoState == false && p.stroke == true) {
         this.servoDown();
@@ -196,7 +196,7 @@ ws.on('open', () => {
     let lastCommand = 0;
 
     setInterval(() => {
-      const unit = 40; //800
+      const unit = 300;
       if(cq.isEmpty()) {
         if(lastCommand < 3 +Math.random()*3) {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
@@ -209,9 +209,7 @@ ws.on('open', () => {
         }
         else {
           // distance should be random
-          for(let i = 0; i < 5; i++) {
-            cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
-          }
+          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
 
           cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
           cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
