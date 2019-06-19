@@ -37,7 +37,7 @@ class CommandQueue {
       this.next();
     }, 10);
     this.scale = 40;
-    this.servoAngleOn = 80+20;
+    this.servoAngleOn = 72+20;
     this.servoAngleOff = 0+20;
     this.servoDelta = 2;
     this.servoDelay = 1000;
@@ -198,7 +198,7 @@ ws.on('open', () => {
     setInterval(() => {
       const unit = 40; //800
       if(cq.isEmpty()) {
-        if(lastCommand < 7) {
+        if(lastCommand < 3 +Math.random()*3) {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
           cq.add({ command: 'home' });
           cq.add({ command: 'moveToA', x: 0, y: 300 * cq.scale * cq.yScale, ignoreBumper: 0 });
@@ -214,12 +214,13 @@ ws.on('open', () => {
           }
 
           cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
+          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
           let deg = 0;
           if(Math.random() > 0.5) {
-            deg = 180 - Math.random() * 90;
+            deg = 180 - Math.random() * 30;
           }
           else {
-            deg = -180 + Math.random() * 90;
+            deg = -180 + Math.random() * 30;
           }
           for(let i = 0; i < 10; i++) {
             cq.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 0 });
