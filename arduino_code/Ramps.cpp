@@ -233,20 +233,21 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       }
       //MotorX zal altijd stappen
       motorX.stepOn();
-      dispX++;
+      errorY += 2 * deltaY;
+      errorZ += 2 * deltaZ;
 
-      if (dispX * deltaY > dispY * deltaX)
+      if (errorY > deltaX)
       {
         //motor Y stapt
         motorY.stepOn();
-        dispY++;
+        errorY -= 2 * deltaX;
       }
 
-      if (dispX * deltaZ > dispZ * deltaX)
+      if (errorY > deltaX)
       {
         //motor Z stapt
         motorZ.stepOn();
-        dispZ++;
+        errorZ -= 2 * deltaX;
       }
 
       delayMicroseconds(_delay); //Wacht het aantal microseconden
@@ -269,20 +270,21 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       }
       //MotorZ zal altijd stappen
       motorZ.stepOn();
-      dispZ++;
+      errorX += 2 * deltaX;
+      errorY += 2 * deltaY;
 
-      if (dispZ * deltaX > dispX * deltaZ)
+      if (errorX > deltaZ)
       {
         //motor X stapt
         motorX.stepOn();
-        dispX++;
+        errorX -= 2 * deltaZ;
       }
 
-      if (dispZ * deltaY > dispY * deltaZ)
+      if (errorY > deltaZ)
       {
         //motor Y stapt
         motorY.stepOn();
-        dispY++;
+        errorY -= 2 * deltaZ;
       }
 
       delayMicroseconds(_delay); //Wacht het aantal microseconden
@@ -305,20 +307,21 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       }
       //MotorX zal altijd stappen
       motorY.stepOn();
-      dispY++;
+      errorX += 2 * deltaX;
+      errorZ += 2 * deltaZ;
 
-      if (dispY * deltaX > dispX * deltaY)
+      if (errorX > deltaY)
       {
         //motor X stapt
         motorX.stepOn();
-        dispX++;
+        errorX -= 2 * deltaY;
       }
 
-      if (dispY * deltaZ > dispZ * deltaY)
+      if (errorZ > deltaY)
       {
         //motor Z stapt
         motorZ.stepOn();
-        dispZ++;
+        errorZ -= 2 * deltaY;
       }
 
       delayMicroseconds(_delay); //Wacht het aantal microseconden
@@ -339,6 +342,8 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   motorY.stepOff();
   motorZ.stepOff();
 
+  long errorY = 0L;
+  long errorZ = 0L;
   long dispY = 0L;
   long dispZ = 0L;
 
@@ -372,12 +377,14 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
       //MotorZ zal altijd stappen
       motorZ.stepOn(true);
       dispZ++;
+      errorY += 2 * deltaY;
 
-      if (dispZ * deltaY > dispY * deltaZ)
+      if (errorY > deltaZ)
       {
         //motor Y stapt
         motorY.stepOn(true);
         dispY++;
+        errorY -= 2 * deltaZ;
       }
 
       delayMicroseconds(_delay); //Wacht het aantal microseconden
@@ -397,12 +404,14 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
       //MotorX zal altijd stappen
       motorY.stepOn(true);
       dispY++;
+      errorZ += 2 * deltaZ;
 
-      if (dispY * deltaZ > dispZ * deltaY)
+      if (errorZ > deltaY)
       {
         //motor Z stapt
         motorZ.stepOn(true);
         dispZ++;
+        errorZ -= 2 * deltaY;
       }
 
       delayMicroseconds(_delay); //Wacht het aantal microseconden
