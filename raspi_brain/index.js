@@ -198,7 +198,7 @@ ws.on('open', () => {
     setInterval(() => {
       const unit = 300;
       if(cq.isEmpty()) {
-        if(lastCommand < 3 +Math.random()*3) {
+        if(lastCommand < 2 +Math.random()*2) {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
           cq.add({ command: 'home' });
           cq.add({ command: 'moveToA', x: 0, y: 300 * cq.scale * cq.yScale, ignoreBumper: 0 });
