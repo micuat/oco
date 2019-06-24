@@ -61,11 +61,11 @@ void setup()
   delay(50);
   mysmartservo.moveTo(0,0,50);
 
-  delay(1000);
+  delay(2000);
   digitalWrite(pin_12v0, LOW);
   digitalWrite(pin_12v1, LOW);
 
-  delay(1000);
+  delay(2000);
   digitalWrite(pin_12v0, HIGH);
   digitalWrite(pin_12v1, HIGH);
 
