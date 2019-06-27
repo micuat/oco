@@ -38,6 +38,8 @@ Ramps::Ramps()
   pinMode(Q_STEP_PIN, OUTPUT);
   pinMode(Q_DIR_PIN, OUTPUT);
   pinMode(Q_ENABLE_PIN, OUTPUT);
+
+  ultraSensor.setpin(ULTRA_SENSOR_PIN);
 }
 
 //LED aan (true) of LED uit (false)
@@ -228,7 +230,8 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
+      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < ULTRA_SENSOR_THRESHOLD)
+          && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
@@ -265,7 +268,8 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
+      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < ULTRA_SENSOR_THRESHOLD)
+          && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorZ zal altijd stappen
@@ -302,7 +306,8 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
+      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < ULTRA_SENSOR_THRESHOLD)
+          && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
@@ -371,7 +376,8 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   {
     while (dispZ != deltaZ)
     {
-      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
+      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < ULTRA_SENSOR_THRESHOLD)
+          && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorZ zal altijd stappen
@@ -398,7 +404,8 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   {
     while (dispY != deltaY)
     {
-      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
+      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < ULTRA_SENSOR_THRESHOLD)
+          && ignoreBumper == false) { // BUMPER HIT
         return BUMPER_STOPPED;
       }
       //MotorX zal altijd stappen
@@ -430,7 +437,7 @@ int Ramps::driveTillHit(int _delay) {
   motorY.stepOff();
   motorZ.stepOff();
 
-  while (digitalRead(pin_bumper0) == HIGH)
+  while (digitalRead(pin_bumper0) == HIGH && ultraSensor.distanceCm() >= ULTRA_SENSOR_THRESHOLD)
   {
     motorY.stepOn(true);
     motorZ.stepOn(true);

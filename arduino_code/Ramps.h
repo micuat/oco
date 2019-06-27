@@ -6,6 +6,10 @@
 #ifndef _Ramps_h
 #define _Ramps_h
 
+#include "MeAuriga.h"
+#include <SoftwareSerial.h>
+#include <Wire.h>
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
 #else
@@ -54,9 +58,14 @@
 #define TEMP_0_PIN         13	// Analoge numering
 #define TEMP_1_PIN         14	// Analoge numering
 
+const int ULTRA_SENSOR_PIN = 7;
+MeUltrasonicSensor ultraSensor(ULTRA_SENSOR_PIN);
+
 class Ramps
 {
-	public: //Public functies en variabelen
+  public: //Public functies en variabelen
+    const double ULTRA_SENSOR_THRESHOLD = 80;
+
     const int DONE_NORMALLY = 0;
     const int X_STOPPED = 1;
     const int BUMPER_STOPPED = 2;
@@ -65,42 +74,42 @@ class Ramps
     const long yScale = 1;
 
     int pin_bumper0;
-		//Constructor
-		Ramps();
+    //Constructor
+    Ramps();
 
-		//Beweeg Motors X, Y en Z naar hun Home positie
-		void home(int _delay);
-		void homeX(int _delay);
+    //Beweeg Motors X, Y en Z naar hun Home positie
+    void home(int _delay);
+    void homeX(int _delay);
 
-		//LED aan (true) of LED uit (false)
-		void led(bool On);
+    //LED aan (true) of LED uit (false)
+    void led(bool On);
 
-		//heater (0 of 1) aansturen met PWM (byte)
-		void heater(int heaterNum, byte value);
+    //heater (0 of 1) aansturen met PWM (byte)
+    void heater(int heaterNum, byte value);
 
-		//Fan aan (true) of fan uit (false)
-		void fan(bool On);
+    //Fan aan (true) of fan uit (false)
+    void fan(bool On);
 
-		//Beweeg naar gegeven positie met bresenhams lijn algoritme
-		int moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper);
+    //Beweeg naar gegeven positie met bresenhams lijn algoritme
+    int moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper);
 
-		int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper);
+    int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper);
 
     int driveTillHit(int _delay);
 
-		//declareren van motors
-		PololuStepper motorX = PololuStepper(	X_STEP_PIN, X_DIR_PIN,
-												X_ENABLE_PIN);
-		PololuStepper motorY = PololuStepper(	Y_STEP_PIN, Y_DIR_PIN,
-												Y_ENABLE_PIN);
-		PololuStepper motorZ = PololuStepper(	Z_STEP_PIN, Z_DIR_PIN,
-												Z_ENABLE_PIN);
-		PololuStepper motorE = PololuStepper(	E_STEP_PIN, E_DIR_PIN,
-												E_ENABLE_PIN);
-		PololuStepper motorQ = PololuStepper(	Q_STEP_PIN, Q_DIR_PIN,
-												Q_ENABLE_PIN);
+    //declareren van motors
+    PololuStepper motorX = PololuStepper(	X_STEP_PIN, X_DIR_PIN,
+                                          X_ENABLE_PIN);
+    PololuStepper motorY = PololuStepper(	Y_STEP_PIN, Y_DIR_PIN,
+                                          Y_ENABLE_PIN);
+    PololuStepper motorZ = PololuStepper(	Z_STEP_PIN, Z_DIR_PIN,
+                                          Z_ENABLE_PIN);
+    PololuStepper motorE = PololuStepper(	E_STEP_PIN, E_DIR_PIN,
+                                          E_ENABLE_PIN);
+    PololuStepper motorQ = PololuStepper(	Q_STEP_PIN, Q_DIR_PIN,
+                                          Q_ENABLE_PIN);
 
-	private: //Private functies en variabelen
+  private: //Private functies en variabelen
 
 };
 

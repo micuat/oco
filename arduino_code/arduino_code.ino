@@ -3,7 +3,7 @@
 #include "SerialCommand.h"
 
 #include <SoftwareSerial.h>
-#include "MeAuriga.h"
+//#include "MeAuriga.h"
 
 MeSmartServo mysmartservo(PORT5); // somehow goes to tx2/rx2 of mega
 

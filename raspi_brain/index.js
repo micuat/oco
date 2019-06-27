@@ -114,8 +114,27 @@ class CommandQueue {
     }
   }
   uturn() {
-    this.add({ command: 'drive', x: 0, y: -this.driveSteps * 9, ignoreBumper: 1 });
-    this.add({ command: 'rotate', deg: 90, ignoreBumper: 0 });
+    const unit = 300 * this.scale * this.yScale;
+    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 0 });
+
+    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 0 });
+    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 0 });
+    let deg = 0;
+    if(Math.random() > 0.5) {
+      deg = 180 - Math.random() * 30;
+    }
+    else {
+      deg = -180 + Math.random() * 30;
+    }
+    for(let i = 0; i < 10; i++) {
+      this.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 0 });
+    }
+
+    // distance should be random
+    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 0 });
+
+    this.add({ command: 'clearY' });
+    this.add({ command: 'clearZ' });
   }
   driveTillHit() {
     this.add({ command: 'driveTillHit' });
@@ -186,6 +205,7 @@ io.on('connection', (socket) => {
   }
 });
 
+let lastCommand = 0;
 ws.on('open', () => {
   cq.servoUp();
   cq.add({ command: 'home' });
@@ -193,10 +213,8 @@ ws.on('open', () => {
   cq.add({ command: 'clearZ' });
 
   if (autopilot) {
-    let lastCommand = 0;
 
     setInterval(() => {
-      const unit = 300;
       if(cq.isEmpty()) {
         if(lastCommand < 2 +Math.random()*2) {
           cq.addPoints(parseInt(Math.floor(Math.random() * points.length)));
@@ -209,26 +227,9 @@ ws.on('open', () => {
         }
         else {
           // distance should be random
-          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
-
-          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
-          cq.add({ command: 'drive', x: 0, y: -unit * cq.scale * cq.yScale, ignoreBumper: 0 });
-          let deg = 0;
-          if(Math.random() > 0.5) {
-            deg = 180 - Math.random() * 30;
-          }
-          else {
-            deg = -180 + Math.random() * 30;
-          }
-          for(let i = 0; i < 10; i++) {
-            cq.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 0 });
-          }
-
-          // distance should be random
-          cq.add({ command: 'drive', x: 0, y: unit * cq.scale * cq.yScale, ignoreBumper: 0 });
-
-          cq.add({ command: 'clearY' });
-          cq.add({ command: 'clearZ' });
+          const unit = 300 * cq.scale * cq.yScale;
+          cq.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 0 });
+          cq.uturn();
           lastCommand = 0;
         }
       }
@@ -252,6 +253,7 @@ ws.on('message', (data) => {
   if (status == Status.bumper_stopped) {
     cq.clear();
     cq.uturn();
+    lastCommand = 0;
   }
   io.emit('position', { x, y, z });
 });
