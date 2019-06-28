@@ -10,5 +10,7 @@
   "driveDelay": 100,
   "yScale": 10,
   "bumperCount": 1,
-  "distanceThreshold": 100
+  "distanceThreshold": 150,
+  "unit": 400,
+  "rotmult": 1
 }
