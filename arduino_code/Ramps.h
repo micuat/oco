@@ -58,7 +58,7 @@
 #define TEMP_0_PIN         13	// Analoge numering
 #define TEMP_1_PIN         14	// Analoge numering
 
-const int ULTRA_SENSOR_PIN = 7;
+const int ULTRA_SENSOR_PIN = 25;
 MeUltrasonicSensor ultraSensor(ULTRA_SENSOR_PIN);
 
 class Ramps
