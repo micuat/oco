@@ -91,9 +91,9 @@ class Ramps
     void fan(bool On);
 
     //Beweeg naar gegeven positie met bresenhams lijn algoritme
-    int moveTo(long targetX, long targetY, long targetZ, int _delay, int bumperCount, int distanceThreshold);
+    int moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold);
 
-    int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, int bumperCount, int distanceThreshold);
+    int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold);
 
     //int driveTillHit(int _delay);
 
@@ -280,7 +280,7 @@ void Ramps::homeX(int _delay)
   motorX.position = 0;
 }
 
-int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, int bumperCount, int distanceThreshold)
+int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold)
 {
 
   //stepOff van motoren
@@ -300,7 +300,6 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, int bump
   long errorY = 0L;
   long errorZ = 0L;
 
-  bool ignoreBumper = bumperCount <= 0;
   int bCount = 0;
 
   if (deltaX < 0L)
@@ -458,7 +457,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, int bump
   return DONE_NORMALLY;
 }
 
-int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, int bumperCount, int distanceThreshold)
+int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold)
 {
 
   //stepOff van motoren
@@ -470,7 +469,6 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, int bump
   long dispY = 0L;
   long dispZ = 0L;
 
-  bool ignoreBumper = bumperCount <= 0;
   int bCount = 0;
 
   if (deltaY < 0L)

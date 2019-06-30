@@ -114,8 +114,10 @@ void moveTo() {
   yPos = atol(arg);
   arg = command.next();
   zPos = atol(arg);
+  arg = command.next();
+  bool ignoreBumper = atoi(arg) > 0;
 
-  int res = ramps.moveTo(xPos, yPos, zPos, speed, bumperCount, distanceThreshold);
+  int res = ramps.moveTo(xPos, yPos, zPos, speed, ignoreBumper, bumperCount, distanceThreshold);
   printPosition(res);
 }
 
@@ -141,8 +143,10 @@ void drive() {
   yPos = atol(arg);
   arg = command.next();
   zPos = atol(arg);
+  arg = command.next();
+  bool ignoreBumper = atoi(arg) > 0;
 
-  int res = ramps.moveDelta(0, yPos, zPos, speed, bumperCount, distanceThreshold);
+  int res = ramps.moveDelta(0, yPos, zPos, speed, ignoreBumper, bumperCount, distanceThreshold);
   printPosition(res);
 }
 
