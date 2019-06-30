@@ -44,10 +44,17 @@ class CommandQueue {
     this.hit = false;
     this.driveDelay = 100;
     this.yScale = 10;
+    this.bumperCount = 1;
+    this.distanceThreshold = 100;
 
     this.execCommand = {
       home: (command) => {
         this.send('home');
+      },
+      setParams: (command) => {
+        this.send(`setSpeed ${this.driveDelay}`);
+        this.send(`setDistanceTh ${this.distanceThreshold}`);
+        this.send(`setBumperCount ${this.bumperCount}`);
       },
       wait: (command) => {
         this.send(`wait ${command.delay}`);
@@ -62,16 +69,17 @@ class CommandQueue {
         this.send('clearZ');
       },
       moveToA: (command) => {
-        this.send(`moveToA ${command.x} ${command.y} ${command.y} ${this.driveDelay} ${command.ignoreBumper}`);
+        this.send(`m ${command.x} ${command.y} ${command.y} ${command.ignoreBumper}`);
       },
       drive: (command) => {
-        this.send(`drive ${command.x} ${command.y} ${command.y} ${this.driveDelay} ${command.ignoreBumper}`);
+        this.send(`d ${command.x} ${command.y} ${command.y} ${command.ignoreBumper}`);
       },
       driveTillHit: (command) => {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        this.send(`drive 0 ${parseInt(command.deg * 19000.0 / 9.0)} ${-parseInt(command.deg * 19000.0 / 9.0)} ${this.driveDelay} ${command.ignoreBumper}`);
+        let y = parseInt(command.deg * 19000.0 / 9.0);
+        this.send(`d 0 ${y} ${-y} ${command.ignoreBumper}`);
       },
       servo: (command) => {
         this.send(`servo ${command.deg} ${command.delta} ${command.delay}`);
@@ -115,10 +123,10 @@ class CommandQueue {
   }
   uturn() {
     const unit = 300 * this.scale * this.yScale;
-    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 0 });
+    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 1 });
 
-    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 0 });
-    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 0 });
+    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
+    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
     let deg = 0;
     if(Math.random() > 0.5) {
       deg = 180 - Math.random() * 30;
@@ -127,11 +135,11 @@ class CommandQueue {
       deg = -180 + Math.random() * 30;
     }
     for(let i = 0; i < 10; i++) {
-      this.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 0 });
+      this.add({ command: 'rotate', deg: deg * 0.1, ignoreBumper: 1 });
     }
 
     // distance should be random
-    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 0 });
+    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 1 });
 
     this.add({ command: 'clearY' });
     this.add({ command: 'clearZ' });
@@ -211,6 +219,7 @@ ws.on('open', () => {
   cq.add({ command: 'home' });
   cq.add({ command: 'clearY' });
   cq.add({ command: 'clearZ' });
+  cq.add({ command: 'setParams' });
 
   if (autopilot) {
 
