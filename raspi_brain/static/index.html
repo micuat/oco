@@ -1,105 +1,96 @@
+<!doctype html>
 <html>
 
 <head>
+  <title>OSC Eval</title>
   <style>
-    body,
-    #container {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font: 13px Monaco, 'Courier New', Helvetica, Arial;
+      padding: 0;
+      margin: 0;
+    }
+
+    form {
+      background: #888;
+      padding: 3px;
+      /*position: fixed; bottom: 0;*/
       width: 100%;
-      padding: 0px;
-      margin: 0px;
+    }
+
+    form input {
+      background: #ddd;
+      border: 0;
+      padding: 10px;
+      width: 50%;
+      margin-right: .5%;
+    }
+
+    form button {
+      width: 50%;
+      background: rgb(255, 255, 255);
+      border: none;
+      padding: 10px;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages li {
+      padding: 5px 10px;
+    }
+
+    #messages li:nth-child(odd) {
+      background: #eee;
     }
   </style>
 </head>
 
 <body>
-  <div id="container">
+  <div id="debug">
+    <p>Debug</p>
+    <form id="save" action="">
+      <input id="distanceThreshold" autocomplete="off" value="100" /> distance threshold (cm)
+      <input id="yScale" autocomplete="off" value="10" /> ratio of y (wheels) to x (slider)
+      <button>Save</button>
+    </form>
+    <form id="restart" action="">
+      <button>Restart</button>
+    </form>
+    <ul id="messages"></ul>
   </div>
-
-  <script src="./jquery-3.4.1.min.js"></script>
-  <script src="./p5.min.js"></script>
-  <script src="./p5.dom.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="./jquery-3.4.1.min.js"></script>
   <script>
     const socket = io();
-
-    const buttons = {};
-    function setup() {
-      createCanvas(600, 600);
-      buttons.home = createButton('home');
-      buttons.home.mousePressed(() => {
-        socket.emit('client', { command: 'home' })
-      });
-      buttons.drive = createButton('drive');
-      buttons.drive.mousePressed(() => {
-        socket.emit('client', { command: 'drive', steps: 10000 })
-      });
-      buttons.driveTillHit = createButton('drive till hit');
-      buttons.driveTillHit.mousePressed(() => {
-        socket.emit('client', { command: 'driveTillHit' })
-      });
-      buttons.letter = createButton('letter');
-      buttons.letter.mousePressed(() => {
-        socket.emit('client', { command: 'letter', index: parseInt(Math.random() * 7) })
-      });
-      buttons.left = createButton('left');
-      buttons.left.mousePressed(() => {
-        socket.emit('client', { command: 'rotate', angle: 45 })
-      });
-      buttons.right = createButton('right');
-      buttons.right.mousePressed(() => {
-        socket.emit('client', { command: 'rotate', angle: -45 })
-      });
-    }
-
-    const points = [];
-    const bumper = { status: '' };
-    const position = { x: 0, y: 0 };
-    const positionTarget = { x: 0, y: 0 };
-    const servo = { angle: 0 };
-    function draw() {
-      let bg;
-      if (bumper.status == 'hit') {
-        bg = [255, 0, 0];
-      }
-      else if (bumper.status == 'released') {
-        bg = [0, 255, 0];
-      }
-      else
-        bg = [0, 0, 0];
-      background(bg[0], bg[1], bg[2]);
-      translate(width / 2, height / 2);
-      stroke(255);
-      beginShape(POINTS);
-      for (const p of points) {
-        vertex(p.x, p.y);
-      }
-      endShape();
-      fill(255);
-      position.x = lerp(position.x, positionTarget.x, 0.5);
-      position.y = lerp(position.y, positionTarget.y, 0.5);
-      ellipse(position.x, position.y, 20, 20);
-    }
-    socket.on('bumper', (msg) => {
-      console.log(msg)
-      bumper.status = msg.status;
+    $('#save').submit(function () {
+      const pak = {
+        distanceThreshold: $('#distanceThreshold').val(),
+        yScale: $('#yScale').val(),
+      };
+      socket.emit('saveSettings', pak);
+      return false;
     });
-    // socket.on('position', (msg) => {
-    //   console.log(msg)
-    // });
-    socket.on('world', (msg) => {
-      console.log(msg)
-      positionTarget.x = msg.x * 0.1 / 40;
-      positionTarget.y = msg.y * 0.1 / 40;
-      if (servo.angle > 70) {
-        points.push({ x: msg.x * 0.1, y: msg.y * 0.1 });
-        if (points.length > 1000) {
-          points.shift();
-        }
-      }
+    $('#restart').submit(function () {
+      socket.emit('restart');
+      return false;
     });
-    socket.on('servo', (msg) => {
-      console.log(msg)
-      servo.angle = msg.angle;
+    socket.on('log', function (msg) {
+      $('#messages').prepend($('<li>').text(msg));
+      var count = 0;
+      // $("li").each(function( index ) {
+      // count++;
+      // if(count > 5)
+      //   $( this ).remove();
+      // });
     });
   </script>
 </body>

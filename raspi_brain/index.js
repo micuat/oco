@@ -184,32 +184,16 @@ class CommandQueue {
 const cq = new CommandQueue(settings);
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
-  if (autopilot == false) {
-    socket.on('client', (msg) => {
-      console.log('message: ' + msg.command);
-      switch (msg.command) {
-        case 'home':
-          cq.add({ command: 'home' });
-          break;
-        case 'drive':
-          cq.add({ command: 'drive', x: 0, y: msg.steps, ignoreBumper: 0 });
-          break;
-        case 'driveTillHit':
-          cq.driveTillHit();
-          break;
-        case 'letter':
-          cq.addPoints(msg.index);
-          cq.add({ command: 'moveToA', x: 0, y: 800 * cq.scale * cq.yScale, ignoreBumper: 0 });
-          cq.add({ command: 'clearY' });
-          cq.add({ command: 'clearZ' });
-          break;
-        case 'rotate':
-          cq.add({ command: 'rotate', deg: msg.angle, ignoreBumper: 0 });
-          break;
-      }
-    });
-  }
+  console.log('a socket io user connected');
+  socket.on('saveSettings', (msg) => {
+    const newSettings = JSON.stringify({...settings, ...msg,});
+
+    fs.writeFile('settings.json', newSettings, error => console.error);
+    console.log('message: ' + newSettings);
+  });
+  socket.on('restart', (msg) => {
+    process.exit();
+  })
 });
 
 let lastCommand = 0;
