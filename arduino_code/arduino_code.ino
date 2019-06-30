@@ -45,14 +45,16 @@ void setup()
   Serial.begin(250000);
   
   command.addCommand("home", homeX);
-  command.addCommand("moveToA", moveTo);
+  command.addCommand("m", moveTo);
   command.addCommand("servo", rotServo);
   command.addCommand("clearX", clearX);
   command.addCommand("clearY", clearY);
   command.addCommand("clearZ", clearZ);
-  command.addCommand("drive", drive);
-  command.addCommand("driveTillHit", driveTillHit);
+  command.addCommand("d", drive);
   command.addCommand("wait", wait);
+  command.addCommand("setSpeed", setSpeed);
+  command.addCommand("setDistanceTh", setDistanceTh);
+  command.addCommand("setBumperCount", setBumperCount);
 
   delay(1000);
   mysmartservo.begin(115200);
@@ -99,6 +101,11 @@ void clearZ() {
 }
 
 long xPos, yPos, zPos;
+
+int speed = 100;
+int distanceThreshold = 100;
+int bumperCount = 0;
+
 void moveTo() {
   char *arg;
   arg = command.next();
@@ -107,16 +114,8 @@ void moveTo() {
   yPos = atol(arg);
   arg = command.next();
   zPos = atol(arg);
-  arg = command.next();
-  int sp = atoi(arg);
-  arg = command.next();
-  bool ignoreBumper = atoi(arg) > 0;
-  arg = command.next();
-  int bumperCount = atoi(arg);
-  arg = command.next();
-  int distanceThreshold = atoi(arg);
 
-  int res = ramps.moveTo(xPos, yPos, zPos, sp, ignoreBumper, bumperCount, distanceThreshold);
+  int res = ramps.moveTo(xPos, yPos, zPos, speed, bumperCount, distanceThreshold);
   printPosition(res);
 }
 
@@ -142,24 +141,8 @@ void drive() {
   yPos = atol(arg);
   arg = command.next();
   zPos = atol(arg);
-  arg = command.next();
-  int sp = atoi(arg);
-  arg = command.next();
-  bool ignoreBumper = atoi(arg) > 0;
-  arg = command.next();
-  int bumperCount = atoi(arg);
-  arg = command.next();
-  int distanceThreshold = atoi(arg);
 
-  int res = ramps.moveDelta(0, yPos, zPos, sp, ignoreBumper, bumperCount, distanceThreshold);
-  printPosition(res);
-}
-
-void driveTillHit() {
-  char *arg;
-  arg = command.next();
-  int sp = atoi(arg);
-  int res = ramps.driveTillHit(sp);
+  int res = ramps.moveDelta(0, yPos, zPos, speed, bumperCount, distanceThreshold);
   printPosition(res);
 }
 
@@ -168,5 +151,26 @@ void wait() {
   arg = command.next();
   long msec = atol(arg);
   delay(msec);
+  printPosition(STATUS_UNKNOWN);
+}
+
+void setSpeed() {
+  char *arg;
+  arg = command.next();
+  speed = atoi(arg);
+  printPosition(STATUS_UNKNOWN);
+}
+
+void setDistanceTh() {
+  char *arg;
+  arg = command.next();
+  distanceThreshold = atoi(arg);
+  printPosition(STATUS_UNKNOWN);
+}
+
+void setBumperCount() {
+  char *arg;
+  arg = command.next();
+  bumperCount = atoi(arg);
   printPosition(STATUS_UNKNOWN);
 }
