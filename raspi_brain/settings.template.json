@@ -1,5 +1,14 @@
 {
   "httpPort": 2080,
   "wsUrl": "ws://localhost:8080",
-  "autopilot": true
+  "autopilot": true,
+  "scale": 40,
+  "servoAngleOn": 92,
+  "servoAngleOff": 20,
+  "servoDelta": 2,
+  "servoDelay": 1000,
+  "driveDelay": 100,
+  "yScale": 10,
+  "bumperCount": 1,
+  "distanceThreshold": 100
 }

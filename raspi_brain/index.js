@@ -29,23 +29,22 @@ http.listen(settings.httpPort, () => {
 });
 
 class CommandQueue {
-  constructor() {
+  constructor(settings) {
     this.queue = [];
     this.isWaitingForReply = false;
-    this.driveSteps = 1000;
     this.handler = setInterval(() => {
       this.next();
     }, 10);
-    this.scale = 40;
-    this.servoAngleOn = 72+20;
-    this.servoAngleOff = 0+20;
-    this.servoDelta = 2;
-    this.servoDelay = 1000;
+    this.scale = settings.scale;
+    this.servoAngleOn = settings.servoAngleOn;
+    this.servoAngleOff = settings.servoAngleOff;
+    this.servoDelta = settings.servoDelta;
+    this.servoDelay = settings.servoDelay;
     this.hit = false;
-    this.driveDelay = 100;
-    this.yScale = 10;
-    this.bumperCount = 1;
-    this.distanceThreshold = 100;
+    this.driveDelay = settings.driveDelay;
+    this.yScale = settings.yScale;
+    this.bumperCount = settings.bumperCount;
+    this.distanceThreshold = settings.distanceThreshold;
 
     this.execCommand = {
       home: (command) => {
@@ -182,7 +181,7 @@ class CommandQueue {
     }
   }
 }
-const cq = new CommandQueue();
+const cq = new CommandQueue(settings);
 
 io.on('connection', (socket) => {
   console.log('a user connected');
