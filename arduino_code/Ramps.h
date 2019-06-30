@@ -91,9 +91,9 @@ class Ramps
     void fan(bool On);
 
     //Beweeg naar gegeven positie met bresenhams lijn algoritme
-    int moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper);
+    int moveTo(long targetX, long targetY, long targetZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold);
 
-    int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper);
+    int moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ignoreBumper, int bumperCount, int distanceThreshold);
 
     int driveTillHit(int _delay);
 
