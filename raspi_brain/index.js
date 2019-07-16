@@ -121,13 +121,12 @@ class CommandQueue {
     }
   }
   uturn() {
-    if (this.servoState == true) {
-      this.servoUp();
-    }
-    const unit = 100 * this.scale * this.yScale;
-    this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 1 });
+    this.servoUp();
 
-    this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
+    const unit = 200 * this.scale * this.yScale;
+    //this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 1 });
+
+    //this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
     this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
     let deg = 0;
     if(Math.random() > 0.5) {
