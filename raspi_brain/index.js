@@ -77,7 +77,7 @@ class CommandQueue {
         this.send(`driveTillHit ${this.driveDelay}`);
       },
       rotate: (command) => {
-        let y = parseInt(command.deg * 19000.0 / 9.0);
+        let y = parseInt(command.deg * 19000.0 / 9.0 / 2.0);
         this.send(`d 0 ${y} ${-y} ${command.ignoreBumper}`);
       },
       servo: (command) => {
@@ -121,7 +121,10 @@ class CommandQueue {
     }
   }
   uturn() {
-    const unit = 300 * this.scale * this.yScale;
+    if (this.servoState == true) {
+      this.servoUp();
+    }
+    const unit = 100 * this.scale * this.yScale;
     this.add({ command: 'drive', x: 0, y: unit, ignoreBumper: 1 });
 
     this.add({ command: 'drive', x: 0, y: -unit, ignoreBumper: 1 });
