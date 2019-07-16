@@ -341,8 +341,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < distanceThreshold)
-          && ignoreBumper == false) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         bCount++;
         if(bCount >= bumperCount)
           return BUMPER_STOPPED;
@@ -381,8 +380,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < distanceThreshold)
-          && ignoreBumper == false) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         bCount++;
         if(bCount >= bumperCount)
           return BUMPER_STOPPED;
@@ -421,8 +419,7 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       if (digitalRead(X_MIN_PIN) == LOW && motorX.position > switch_threshold) { // X HIT
         return X_STOPPED;
       }
-      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < distanceThreshold)
-          && ignoreBumper == false) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         bCount++;
         if(bCount >= bumperCount)
           return BUMPER_STOPPED;
@@ -454,6 +451,8 @@ int Ramps::moveTo(long targetX, long targetY, long targetZ, int _delay, bool ign
       motorZ.stepOff();
     }
   }
+  if(ultraSensor.distanceCm() < distanceThreshold && ignoreBumper == false)
+    return BUMPER_STOPPED;
   return DONE_NORMALLY;
 }
 
@@ -495,8 +494,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   {
     while (dispZ != deltaZ)
     {
-      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < distanceThreshold)
-          && ignoreBumper == false) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         bCount++;
         if(bCount >= bumperCount)
           return BUMPER_STOPPED;
@@ -525,8 +523,7 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
   {
     while (dispY != deltaY)
     {
-      if ((digitalRead(pin_bumper0) == LOW || ultraSensor.distanceCm() < distanceThreshold)
-          && ignoreBumper == false) { // BUMPER HIT
+      if (digitalRead(pin_bumper0) == LOW && ignoreBumper == false) { // BUMPER HIT
         bCount++;
         if(bCount >= bumperCount)
           return BUMPER_STOPPED;
@@ -551,6 +548,8 @@ int Ramps::moveDelta(long deltaX, long deltaY, long deltaZ, int _delay, bool ign
       motorZ.stepOff();
     }
   }
+  if(ultraSensor.distanceCm() < distanceThreshold && ignoreBumper == false)
+    return BUMPER_STOPPED;
   return DONE_NORMALLY;
 }
 
